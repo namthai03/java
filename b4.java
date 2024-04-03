@@ -9,10 +9,12 @@ thông báo gì khác. */
 public class b4 {
     public static void main(String[] args){
         
-        if(args[0].equals(args[1]) && args[2].equals(args[1]) && args[0].equals(args[2]))
+        if(args[0].equals(args[1]) && args[2].equals(args[1]) && args[0].equals(args[2])){
             System.out.println("True");
-        else 
+        }
+        else {
             System.out.println("False");
+        }
     }
 }
       
