@@ -1,22 +1,72 @@
-/* Viết chương trình theo mô tả: Đầu vào là 3 số nguyên nhận từ đối dòng lệnh, kết quả là 3 số
-theo thứ tự tăng dần in trên 1 dòng, các số cách nhau bởi 01 khoảng trống. (dùng phương thức
-println in kết quả) */
+/* Phần tài khoản người dùng, tạo tk, đăng nhập, ...... */
 
 
-public class b1 {
-    public static void main(String[] args){
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+/**
+ *
+ * @author Administrator
+ */
+public class TaiKhoan {
+    private String tenTK;
+    private String matKhau;
+
+    public String getTenTK() {
+        return tenTK;
+    }
+
+    public void setTenTK(String tenTK) {
+        this.tenTK = tenTK;
+    }
+
+    public String getMatKhau() {
+        return matKhau;
+    }
+
+    public void setMatKhau(String matKhau) {
+        this.matKhau = matKhau;
+    }
+
+    public TaiKhoan() {
+        this.tenTK = "";
+        this.matKhau = "";
+    }
+
+    public TaiKhoan(String tenTK, String matKhau) {
+        this.tenTK = tenTK;
+        this.matKhau = matKhau;
+    }
+    @Override
+    public String toString() {
+        return this.tenTK+","+this.matKhau;
+    }
+    
+       public static ArrayList<TaiKhoan> getTKNVList() {
+        ArrayList<TaiKhoan> listTK = new ArrayList<TaiKhoan>();
+        String fileName = "CSDL\\TKQL.txt";
+        String line;
+
+        try {
+            FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] fields = line.split(",");
+                String tenTK = fields[0];
+                String matKhau = fields[1];
+                TaiKhoan tk = new TaiKhoan(tenTK, matKhau);
+                listTK.add(tk);
+            }
+            bufferedReader.close();
+        }
         
-        int num1 = 0, num2 = 0, num3 = 0;
-        int min = 0, max = 0, mid = 0;
-        num1 = Integer.parseInt(args[0]);
-        num2 = Integer.parseInt(args[1]);
-        num3 = Integer.parseInt(args[2]);
-        max = Math.max(num1, Math.max(num2,num3));
-        min = Math.min(num1, Math.min(num2,num3));
-        mid = num1 + num2 + num3 - min -max;
-        System.out.println(min);
-        System.out.println(mid);
-        System.out.println(max);
+        catch (IOException e) {
+            System.out.println("Error reading file " + fileName);
+        }
+        return listTK;
     }
 }
 
