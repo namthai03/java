@@ -1,0 +1,136 @@
+USE [B10_PC1]
+GO
+
+/****** Object:  StoredProcedure [dbo].[usp_B30AccDoc_DefaultDocNo]    Script Date: 22/05/2025 7:57:20 SA ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- Coder: ThangNH
+
+
+ALTER PROCEDURE [dbo].[usp_B30AccDoc_DefaultDocNo]
+	@_BranchCode CHAR(3), 
+	@_Stt VARCHAR(16) = '', 
+	@_DocCode VARCHAR(4) = '',
+	@_DocDate DATE,
+	@_RowId_VoucherRegister VARCHAR(16),
+	@_DocNo NVARCHAR(48) OUTPUT,
+	@_outputType TINYINT = 1,		-- 0: Output | 1: Select dữ liệu
+	@_NewId VARCHAR(128) = NULL,		-- Mục đích truyền vào để tránh cached của dll
+	@_DeptId INT = 0
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	-- Tự động lấy thông tin theo AppName khi thực hiện trong chương trình, không theo tham số truyền vào
+	SET @_BranchCode = dbo.ufn_sys_GetValueFromAppName('BranchCode', @_BranchCode)
+
+	SET @_outputType = ISNULL(@_outputType, 1)
+
+	IF ISNULL(@_DocNo, '') <> '' AND @_outputType = 1
+	BEGIN
+		SELECT @_DocNo;
+
+		RETURN;
+	END
+
+	DECLARE @_DocNoFormatStyle NVARCHAR(32) = '', @_DocCodeNumbering VARCHAR(3) = '', @_AutoNumbering TINYINT = 0,
+		@_TableHeader VARCHAR(256) = 'B30AccDoc', @_KeyColumnName VARCHAR(64) = 'Stt', @_Ct_Hd INT = 0, @_TenPhong NVARCHAR(24) = '', @_FormatStyle TINYINT = 1
+
+	--ThaiPTN lấy loại định dạng format đánh số : 1-Đánh theo mặc định, 2-Đánh theo tên ban + mặc định
+	SELECT @_FormatStyle = FormatStyle
+	FROM dbo.B00DmCt
+	WHERE Ma_Ct = @_DocCode
+
+	SELECT @_TenPhong = d.Code
+	FROM dbo.B20Dept AS d
+	WHERE d.Id = @_DeptId
+
+	SELECT TOP 1 @_DocCodeNumbering = DocCodeNumbering, 
+		@_AutoNumbering = AutoNumbering, 
+		@_Ct_Hd = Ct_Hd
+	FROM B00DmCt 
+	WHERE Ma_Ct = @_DocCode
+
+	SELECT @_TableHeader = IIF(ISNULL(TableHeader, '') = '', @_TableHeader, TableHeader),
+		@_KeyColumnName = IIF(ISNULL(KeyColumnName, '') = '', @_KeyColumnName, KeyColumnName)
+	FROM dbo.B00DmCt 
+	WHERE Ma_Ct = @_DocCodeNumbering
+
+	-- Các chứng từ hóa đơn (liên quan phát hành HDDT) thì không đánh lại số theo định dạng khác
+	IF (@_Ct_Hd = 0 OR @_DocCode = 'XT') AND ISNULL(@_DocCodeNumbering, '') <> ''
+		SET @_DocNoFormatStyle = dbo.ufn_B00DmCt_DocNoFormatStyle(@_DocCodeNumbering, @_BranchCode)
+	IF @_FormatStyle = 2
+	BEGIN
+		IF ISNULL(@_DocNoFormatStyle, '') <> '' 
+			EXECUTE [dbo].[usp_sys_DefaultDocNoByFormatStyleDept]
+				@_BranchCode = @_BranchCode,
+				@_Stt = @_Stt,
+				@_DocCode = @_DocCode,
+				@_DocDate = @_DocDate,
+				@_DocNo = @_DocNo OUTPUT,
+				@_RowId_VoucherRegister = @_RowId_VoucherRegister,
+				@_TableSource = @_TableHeader,
+				@_DocNoFormatStyle = @_DocNoFormatStyle,
+				@_KeyColumnName = @_KeyColumnName,
+				@_AutoNumbering = @_AutoNumbering,
+				@_outputType = 0,
+				@_TenPhong = @_TenPhong
+		ELSE
+		BEGIN
+			EXECUTE [dbo].[usp_sys_DefaultDocNoDept]
+				@_BranchCode = @_BranchCode,
+				@_Stt = @_Stt,
+				@_DocCode = @_DocCode,
+				@_DocDate = @_DocDate,
+				@_RowId_VoucherRegister = @_RowId_VoucherRegister,
+				@_DocNo = @_DocNo OUTPUT,
+				@_SourceTable = @_TableHeader,
+				@_KeyColumnName = @_KeyColumnName,
+				@_AutoNumbering = @_AutoNumbering,
+				@_outputType = 0,
+				@_TenPhong = @_TenPhong
+		END
+	END
+	IF @_FormatStyle = 1
+	BEGIN
+		IF ISNULL(@_DocNoFormatStyle, '') <> '' 
+			EXECUTE [dbo].[usp_sys_DefaultDocNoByFormatStyle]
+				@_BranchCode = @_BranchCode,
+				@_Stt = @_Stt,
+				@_DocCode = @_DocCode,
+				@_DocDate = @_DocDate,
+				@_DocNo = @_DocNo OUTPUT,
+				@_RowId_VoucherRegister = @_RowId_VoucherRegister,
+				@_TableSource = @_TableHeader,
+				@_DocNoFormatStyle = @_DocNoFormatStyle,
+				@_KeyColumnName = @_KeyColumnName,
+				@_AutoNumbering = @_AutoNumbering,
+				@_outputType = 0
+				
+		ELSE
+		BEGIN
+			EXECUTE [dbo].[usp_sys_DefaultDocNo]
+				@_BranchCode = @_BranchCode,
+				@_Stt = @_Stt,
+				@_DocCode = @_DocCode,
+				@_DocDate = @_DocDate,
+				@_RowId_VoucherRegister = @_RowId_VoucherRegister,
+				@_DocNo = @_DocNo OUTPUT,
+				@_SourceTable = @_TableHeader,
+				@_KeyColumnName = @_KeyColumnName,
+				@_AutoNumbering = @_AutoNumbering,
+				@_outputType = 0
+				
+		END
+	END
+	IF @_outputType = 1 
+		SELECT @_DocNo;
+END
+GO
+
+

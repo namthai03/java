@@ -1,0 +1,376 @@
+USE [B10_PC1]
+GO
+
+/****** Object:  StoredProcedure [dbo].[usp_sys_DefaultDocNoByFormatStyleDept2]    Script Date: 22/05/2025 8:26:59 SA ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- Coder: ThangDQ     ->ThaiPTN sửa lại nhiều thứ 
+-- Author: Đinh Quang Thắng		
+-- Description: Thủ tục tự động chạy số theo định dạng khai báo trong B00DmCt, hỗ trợ sinh số riêng biệt theo phòng ban
+ALTER PROCEDURE [dbo].[usp_sys_DefaultDocNoByFormatStyleDept2]
+	@_BranchCode AS CHAR(3), 
+	@_Stt AS VARCHAR(16) = '', 
+	@_DocCode AS VARCHAR(4) = '',
+	@_DocDate AS [DATE],
+	@_DocNo AS NVARCHAR(48) OUTPUT,		
+	@_RowId_VoucherRegister AS VARCHAR(16) = NULL, 
+	@_TableSource VARCHAR(64) = 'B30AccDoc',
+	@_DocNoFormatStyle VARCHAR(64) = '',
+	@_KeyColumnName VARCHAR(64) = 'Stt',
+	@_AutoNumbering TINYINT = NULL,
+	@_DocDateColName VARCHAR(32) = 'DocDate',
+	@_DocNoColName VARCHAR(32) = 'DocNo',
+	@_outputType TINYINT = 0,			-- 0: Output | 1: Select dữ liệu
+	@_TenPhong AS NVARCHAR(24) = ''		-- Thêm tham số tên phòng
+ --WITH ENCRYPTION
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT @_Stt = ISNULL(@_Stt, ''), 
+		@_outputType = ISNULL(@_outputType, 0), 
+		@_AutoNumbering = ISNULL(@_AutoNumbering, 0),
+		@_TenPhong = ISNULL(@_TenPhong, '');
+
+	-- Lấy định dạng khai báo trong chứng từ
+	IF ISNULL(@_DocNoFormatStyle, '') = ''
+		SET @_DocNoFormatStyle = dbo.ufn_B00DmCt_DocNoFormatStyle(@_DocCode, @_BranchCode)
+
+	IF ISNULL(@_DocNoFormatStyle, '') = '' OR ISNULL(@_TableSource, '') = '' OR ISNULL(@_KeyColumnName, '') = ''
+	BEGIN
+		IF @_outputType = 1 
+			SELECT @_DocNo;
+	
+		RETURN
+	END
+
+	IF ISNULL(@_DocDateColName, '') = '' 
+		SET @_DocDateColName = 'DocDate'
+
+	IF ISNULL(@_DocNoColName, '') = '' 
+		SET @_DocNoColName = 'DocNo'
+
+	DECLARE @_sTime DATETIME, @_Msg NVARCHAR(512);
+
+	-- 2024-10-02: ThắngĐQ Fix lại tình huống năm theo năm làm việc lấy theo ngày kết thúc hạch toán
+	DECLARE @_Year INT = YEAR(@_DocDate) 
+	
+	IF @_TableSource LIKE 'B30AccDoc%'
+		SET @_Year = YEAR([dbo].[ufn_B00FiscalYear_GetEndDate](@_DocDate, @_BranchCode)) -- Fix lại tình huống năm làm việc 
+	-- Kết thúc sửa
+
+	-- Lấy định dạng ngày nếu có để bắt điều kiện lọc theo ngày chứng từ
+	DECLARE @_hasDay TINYINT = 0, @_hasMonth TINYINT = 0, @_hasYear TINYINT = 0
+
+	IF CHARINDEX('DD', @_DocNoFormatStyle) > 0
+		SELECT @_hasDay = 1, @_DocNoFormatStyle = REPLACE(@_DocNoFormatStyle, 'DD', REPLACE(STR(DAY(@_DocDate), 2), ' ', '0'))
+
+	-- Xử lý ký tự năm - tháng nếu có
+	IF CHARINDEX('MM', @_DocNoFormatStyle) > 0
+	BEGIN
+		IF CHARINDEX('MMM', @_DocNoFormatStyle) > 0 
+		BEGIN
+			SET @_DocNoFormatStyle = STUFF(@_DocNoFormatStyle, CHARINDEX('MMM', @_DocNoFormatStyle) + 1, 2, '{MM}')
+			SET @_DocNoFormatStyle = REPLACE(@_DocNoFormatStyle,'{MM}', REPLACE(STR(MONTH(@_DocDate), 2), ' ', '0'))
+		END 
+		ELSE
+			SET @_DocNoFormatStyle = REPLACE(@_DocNoFormatStyle,'MM', REPLACE(STR(MONTH(@_DocDate), 2), ' ', '0'))
+
+		SET @_hasMonth = 1
+	END		
+
+	IF CHARINDEX('YYYY', @_DocNoFormatStyle) > 0
+		SELECT @_DocNoFormatStyle = REPLACE(@_DocNoFormatStyle,'YYYY', RIGHT(STR(@_Year, 4), 4)), @_hasYear = 1
+
+	IF CHARINDEX('YY', @_DocNoFormatStyle) > 0
+		SELECT @_DocNoFormatStyle = REPLACE(@_DocNoFormatStyle, 'YY', RIGHT(STR(@_Year, 4), 2)), @_hasYear = 1
+
+	DECLARE @_DocNoFilter NVARCHAR(512), @_DocNoFilterLikeAll NVARCHAR(512), @_DeptFilter NVARCHAR(512) = '';
+
+	-- Thêm điều kiện lọc theo phòng ban
+	IF @_TenPhong <> ''
+		SET @_DeptFilter = 'AND ' + @_DocNoColName + ' LIKE N''' + @_TenPhong + '.%''';
+
+	-- Lấy ký tự số được đánh dấu bằng ký tự ####
+	DECLARE @_Pos1 INT = CHARINDEX('#', @_DocNoFormatStyle), 
+			@_Pos2 INT, @_i INT, @_Len INT
+
+	-- Nếu không khai báo ký tự # thì vẫn trả về định dạng đã được khai báo thay vì trả về trắng
+	IF ISNULL(@_Pos1, 0) = 0
+	BEGIN
+		IF @_outputType = 1 
+			SELECT @_DocNoFormatStyle;
+		ELSE
+			SELECT @_DocNo = @_TenPhong + IIF(@_TenPhong = '', '', '.') + @_DocNoFormatStyle
+
+		RETURN
+	END
+
+	SET @_Len = LEN(@_DocNoFormatStyle)
+	SET @_DocNoFilter = STUFF(@_DocNoFormatStyle, @_Pos1, 1, '_')
+
+	SET @_i = @_Pos1
+	WHILE SUBSTRING(@_DocNoFormatStyle, @_i + 1, 1) = '#' AND @_i + 1 <= @_Len
+	BEGIN
+		SET @_DocNoFilter = STUFF(@_DocNoFilter, @_i + 1, 1, '_')
+		SET @_i = @_i + 1
+	END
+
+	SET @_Pos2 = @_i
+
+	-- Nếu không khai báo ký tự # thì vẫn trả về định dạng đã được khai báo thay vì trả về trắng
+	IF ISNULL(@_Pos2, 0) = 0
+	BEGIN
+		IF @_outputType = 1 
+			SELECT @_DocNo;
+		ELSE
+			SELECT @_DocNo = @_TenPhong + IIF(@_TenPhong = '', '', '.') + @_DocNoFormatStyle
+
+		RETURN
+	END
+
+	SET @_DocNoFilterLikeAll = ISNULL(LEFT(@_DocNoFormatStyle, @_Pos1 - 1), '') + '%' + ISNULL(RIGHT(@_DocNoFormatStyle, @_Len - @_Pos2), '');
+	SET @_DocNoFilter = ISNULL(LEFT(@_DocNoFormatStyle, @_Pos1 - 1), '') +
+						REPLICATE('[0-9]', @_Pos2 - @_Pos1 + 1) + 
+						ISNULL(RIGHT(@_DocNoFormatStyle, @_Len - @_Pos2), '')
+
+	DECLARE @_DocDate1_Filter Date, @_DocDate2_Filter Date = @_DocDate
+
+	-- Nếu không bắt theo ngày thì Scan từ ngày đầu năm tài chính đến ngày cuối
+	IF @_hasDay = 0 AND @_hasMonth = 0 AND @_hasYear = 0
+	BEGIN
+		SET @_DocDate1_Filter = [dbo].[ufn_B00FiscalYear_GetStartDate](@_DocDate, @_BranchCode)
+
+		-- Nếu là chứng từ mà không có định dạng ngày tháng, năm thì bắt theo cả năm tài chính
+		IF @_TableSource LIKE 'B30AccDoc%' 
+			SET @_DocDate2_Filter = [dbo].[ufn_B00FiscalYear_GetEndDate](@_DocDate, @_BranchCode);
+	END 
+	ELSE
+	BEGIN
+		DECLARE @_strDateConvert VARCHAR(24) = ''
+		
+		IF @_hasYear = 1
+			SET @_strDateConvert = RIGHT(STR(YEAR(@_DocDate), 4), 4)
+		
+		--	Nếu định dạng chỉ có Năm/Tháng thì quét trong tháng
+		IF @_hasMonth = 1 AND @_hasYear = 1
+		BEGIN
+			SET @_strDateConvert = REPLACE(STR(MONTH(@_DocDate), 2), ' ', '0') + '/' + @_strDateConvert 
+			SET @_DocDate2_Filter = STR(YEAR(@_DocDate), 4) + REPLACE(STR(MONTH(@_DocDate), 2), ' ', '0') + '01'
+			SET @_DocDate2_Filter = DATEADD(DAY, -1, DATEADD(MONTH, 1, @_DocDate2_Filter))
+		END
+		
+		IF @_hasDay = 1 AND @_hasMonth = 1 AND @_hasYear = 1
+			SET @_strDateConvert = REPLACE(STR(DAY(@_DocDate), 2), ' ', '0') + '/' + @_strDateConvert 	
+
+		IF @_strDateConvert = ''
+			SET @_DocDate1_Filter = [dbo].[ufn_B00FiscalYear_GetStartDate](@_DocDate, @_BranchCode)
+		ELSE
+		BEGIN
+			IF LEN(@_strDateConvert) = 10
+				SET @_DocDate1_Filter = CONVERT(date, @_strDateConvert, 103)
+			ELSE IF LEN(@_strDateConvert) = 7
+				SET @_DocDate1_Filter = CONVERT(date, '01/' + @_strDateConvert, 103)
+			ELSE
+				SET @_DocDate1_Filter = [dbo].[ufn_B00FiscalYear_GetStartDate](@_DocDate, @_BranchCode)
+		END
+	END
+
+	DECLARE @_DocCodeNumbering AS VARCHAR(4), @_DocCode_Filter NVARCHAR(4000), @_RowId_VoucherRegister_Filter NVARCHAR(4000)
+
+	SET @_DocCodeNumbering = ISNULL((SELECT TOP 1 DocCodeNumbering FROM dbo.B00DmCt WITH (NOLOCK) WHERE Ma_Ct = @_DocCode), '')
+	SET @_DocCode_Filter = 'AND DocCode = ''' + @_DocCode + ''''
+
+	IF @_DocCodeNumbering <> '' 
+	BEGIN
+		IF NOT EXISTS (SELECT * FROM dbo.B00DmCt WITH (NOLOCK) WHERE DocCodeNumbering = @_DocCodeNumbering AND Ma_Ct <> @_DocCode)
+			SET @_DocCodeNumbering = ''
+		ELSE
+			SET @_DocCode_Filter = 'AND DocCode IN (' + STUFF((SELECT ',''' + Ma_Ct + '''' FROM dbo.B00DmCt WITH (NOLOCK) 
+												WHERE DocCodeNumbering = @_DocCodeNumbering FOR XML PATH('')), 1, 1, '') + ')'
+	END
+
+	SET @_RowId_VoucherRegister_Filter = ''
+	IF ISNULL(@_RowId_VoucherRegister_Filter, '') <> ''
+		SET @_RowId_VoucherRegister_Filter = 'AND RowId_VoucherRegister_Filter = ''' + @_RowId_VoucherRegister_Filter + ''''
+
+	DECLARE @_DocCodeTmp VARCHAR(4), @_LastCacheId INT, @_CheckFilterKeyAll TINYINT, @_WithNoLock NVARCHAR(512) = '';
+
+	SET @_DocCodeNumbering = ISNULL(@_DocCodeNumbering, '');
+	SET @_DocCodeTmp = IIF(@_DocCodeNumbering = '', @_DocCode, '')
+
+	IF @_AutoNumbering = 1
+	BEGIN
+		SET @_CheckFilterKeyAll = NULL;
+		SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+		SELECT TOP 1 @_LastCacheId = Id, @_CheckFilterKeyAll = CheckFilterKeyAll
+			FROM dbo.B00CacheDocNo WITH (NOLOCK)
+			WHERE SourceTable = @_TableSource 
+				AND BranchCode = @_BranchCode 
+				AND DocCode = @_DocCodeTmp 
+				AND DocCodeNumbering = @_DocCodeNumbering
+				AND FromDate = @_DocDate1_Filter 
+				AND ToDate = @_DocDate2_Filter 
+				AND DocNoFilter = @_DocNoFilter
+				AND DeptName = @_TenPhong
+			ORDER BY DocNo DESC
+
+		SET @_CheckFilterKeyAll = ISNULL(@_CheckFilterKeyAll, 1)
+		SET @_WithNoLock = ' WITH (NOLOCK)'
+	END 
+	ELSE
+		SET @_CheckFilterKeyAll = 0
+
+	DECLARE @_TableList VARCHAR(1000) = ''
+	IF ISNULL(@_AutoNumbering, 0) <> 1 AND ISNULL(@_DocCodeNumbering, '') <> '' 
+		AND (SELECT COUNT(*) FROM (SELECT TableHeader FROM dbo.B00DmCt WITH (NOLOCK) WHERE DocCodeNumbering = @_DocCodeNumbering GROUP BY TableHeader) tb) > 1
+	BEGIN
+	    SELECT @_TableList = @_TableList + TableHeader + ',' 
+			FROM dbo.B00DmCt WITH (NOLOCK) 
+			WHERE DocCodeNumbering = @_DocCodeNumbering
+			GROUP BY TableHeader
+
+		IF ISNULL(@_TableList, '') <> ''
+		BEGIN
+			SET @_TableList = LEFT(@_TableList, LEN(@_TableList) - 1)
+
+			SELECT @_TableList = 'SELECT tb.BranchCode, tb.DocCode, tb.RowId_VoucherRegister, tb.' + @_DocDateColName + ', tb.' + @_DocNoColName + ', tb.' + @_KeyColumnName + ' FROM ' +
+				REPLACE(@_TableList, ',',
+				' tb ' + @_WithNoLock + ' UNION ALL SELECT tb.BranchCode, tb.DocCode, tb.RowId_VoucherRegister, tb.' + @_DocDateColName + ', tb.' + @_DocNoColName + ', tb.' + @_KeyColumnName + ' FROM ') + 
+				' tb ' + @_WithNoLock
+
+			SET @_TableList = '(' + @_TableList + ') tb '
+		END
+	END
+
+	DECLARE @_MaxDocNo NVARCHAR(48), @_Cmd NVARCHAR(4000);
+
+	SET @_MaxDocNo = ''
+	SET @_Cmd = CASE WHEN @_CheckFilterKeyAll = 1 THEN N'
+		SELECT @_MaxDocNo = MAX(' + @_DocNoColName + ') 
+			FROM ' + IIF(@_TableList <> '', @_TableList, @_TableSource + @_WithNoLock) + N' 
+			WHERE BranchCode = ''' + @_BranchCode + N'''
+				AND ' + @_DocDateColName + ' BETWEEN ''' + CAST(@_DocDate1_Filter AS NVARCHAR(11)) + ''' AND ''' + CAST(@_DocDate2_Filter AS NVARCHAR(11)) + N'''
+				' + @_DocCode_Filter + N'
+				' + @_RowId_VoucherRegister_Filter + N'
+				' + @_DeptFilter + N'
+				AND ' + @_DocNoColName + ' LIKE N''' + @_DocNoFilterLikeAll + N'''
+				' + IIF(@_Stt = '', '', 'AND ' + @_KeyColumnName + N' <> ''' + @_Stt + '''') + N'
+					
+		SET @_CheckFilterKeyAll = 1;
+		IF ISNULL(@_MaxDocNo, '''') <> '''' AND ISNULL(@_MaxDocNo, '''') NOT LIKE N''' + @_DocNoFilter + N'''
+		BEGIN
+			SET @_CheckFilterKeyAll = 0;'
+			ELSE '' END + N'
+			SELECT @_MaxDocNo = MAX(' + @_DocNoColName + ') 
+				FROM ' + IIF(@_TableList <> '', @_TableList, @_TableSource + @_WithNoLock) + N'
+				WHERE BranchCode = ''' + @_BranchCode + N'''
+					AND ' + @_DocDateColName + ' BETWEEN ''' + CAST(@_DocDate1_Filter AS NVARCHAR(11)) + ''' AND ''' + CAST(@_DocDate2_Filter AS NVARCHAR(11)) + N'''
+					' + @_DocCode_Filter + N'
+					' + @_RowId_VoucherRegister_Filter + N'
+					' + @_DeptFilter + N'
+					AND ' + @_DocNoColName + ' LIKE N''' + @_DocNoFilter + N'''
+					' + IIF(@_Stt = '', '', 'AND ' + @_KeyColumnName + N' <> ''' + @_Stt + '''') +
+			CASE WHEN @_CheckFilterKeyAll = 1 THEN N'
+		END' ELSE '' END
+
+	EXECUTE sp_executesql @_Cmd, N'@_MaxDocNo NVARCHAR(48) OUTPUT, @_CheckFilterKeyAll TINYINT OUTPUT', @_MaxDocNo OUTPUT, @_CheckFilterKeyAll OUTPUT;
+	
+	-- Lấy số chứng từ từ bảng Cache để cập nhật trong tình huống nhiều người dùng cùng sử dụng thêm mới
+	DECLARE @_CacheMaxDocNo NVARCHAR(48)
+	IF @_AutoNumbering = 1
+	BEGIN
+		SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+		SET @_DocCodeNumbering = ISNULL(@_DocCodeNumbering, '');
+		SET @_DocCodeTmp = IIF(@_DocCodeNumbering = '', @_DocCode, '')
+		SET @_CacheMaxDocNo = NULL;
+		
+		IF @_LastCacheId IS NOT NULL
+			SELECT TOP 1 @_CacheMaxDocNo = DocNo
+				FROM dbo.B00CacheDocNo WITH (UPDLOCK)
+				WHERE Id = @_LastCacheId
+				ORDER BY DocNo DESC
+	
+		IF @_CacheMaxDocNo IS NULL
+		BEGIN
+			INSERT INTO dbo.B00CacheDocNo (
+				SourceTable, BranchCode, 
+				DocCode, DocCodeNumbering, FromDate, ToDate, 
+				DocNoFilter, DocNo, CheckFilterKeyAll, DeptName
+			)
+			SELECT 
+				@_TableSource, @_BranchCode, 
+				IIF(@_DocCodeNumbering = '', @_DocCode, ''), @_DocCodeNumbering, 
+				@_DocDate1_Filter, @_DocDate2_Filter, @_DocNoFilter, '', @_CheckFilterKeyAll, @_TenPhong
+		
+			SET @_LastCacheId = SCOPE_IDENTITY()
+		END 
+		ELSE
+		IF ISNULL(@_CacheMaxDocNo, '') > ISNULL(@_MaxDocNo, '')
+			SET @_MaxDocNo = @_CacheMaxDocNo;
+	END
+
+	DECLARE @_New_DocNo NVARCHAR(32)
+
+	Retry_DocNo:
+	-- Loại bỏ @_TenPhong khỏi @_MaxDocNo nếu có
+	IF @_TenPhong <> '' AND ISNULL(@_MaxDocNo, '') <> '' AND LEFT(@_MaxDocNo, LEN(@_TenPhong) + 1) = @_TenPhong + '.'
+		SET @_MaxDocNo = RIGHT(@_MaxDocNo, LEN(@_MaxDocNo) - LEN(@_TenPhong) - 1)
+
+	IF ISNULL(@_MaxDocNo, '') = ''
+		SET @_New_DocNo = 
+			@_TenPhong + IIF(@_TenPhong = '', '', '.') +
+			ISNULL(LEFT(@_DocNoFormatStyle, @_Pos1 - 1), '') +
+			REPLICATE('0', @_Pos2 - @_Pos1) + '1' + 
+			ISNULL(RIGHT(@_DocNoFormatStyle, @_Len - @_Pos2), '')
+	ELSE 
+	BEGIN
+		DECLARE @_Max_Number NVARCHAR(32)
+		
+		SET @_Max_Number = SUBSTRING(@_MaxDocNo, @_Pos1, @_Pos2 - @_Pos1 + 1)
+
+		IF ISNUMERIC(@_Max_Number) = 1
+			SET @_New_DocNo = 
+				@_TenPhong + IIF(@_TenPhong = '', '', '.') +
+				ISNULL(LEFT(@_DocNoFormatStyle, @_Pos1 - 1), '') +
+				REPLACE(STR(CAST(@_Max_Number AS INT) + 1, @_Pos2 - @_Pos1 + 1), ' ', '0') + 
+				ISNULL(RIGHT(@_DocNoFormatStyle, @_Len - @_Pos2), '')
+		ELSE
+			SET @_New_DocNo = 
+				@_TenPhong + IIF(@_TenPhong = '', '', '.') +
+				ISNULL(LEFT(@_DocNoFormatStyle, @_Pos1 - 1), '') +
+				REPLICATE('0', @_Pos2 - @_Pos1) + '1' + 
+				ISNULL(RIGHT(@_DocNoFormatStyle, @_Len - @_Pos2), '')
+	END
+
+	SET @_DocNo = @_New_DocNo;
+
+	IF @_AutoNumbering = 1
+	BEGIN
+		DECLARE @_Break TINYINT = 0
+
+		WHILE @_Break = 0
+		BEGIN
+			IF EXISTS(SELECT * FROM dbo.B00CacheDocNo WITH (READPAST) WHERE Id = @_LastCacheId)	
+			BEGIN
+				UPDATE dbo.B00CacheDocNo
+					SET DocNo = @_DocNo, CheckFilterKeyAll = @_CheckFilterKeyAll, LastModifiedAt = GETUTCDATE()
+					WHERE Id = @_LastCacheId
+				BREAK
+			END
+		END
+	END
+	
+	IF @_outputType = 1 
+		SELECT @_DocNo;
+END
+GO
+
+

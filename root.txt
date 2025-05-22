@@ -1,0 +1,3720 @@
+<root>
+	<TableCollection>
+		<Ct template="AccDoc_Edit">
+			<FilterKey>Ct.DocCode='BN'</FilterKey>
+			<ServerLoaded>
+				<Eval_BizProcess_UserIdList_GetValue>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>usp_B20DocProcess_UserIdList</Command>
+					<Parameters>
+						<DocCode>DocCode</DocCode>
+						<Stt>Stt</Stt>
+						<RowId_DocProcess>RowId_DocProcess</RowId_DocProcess>
+						<DocProcessId>DocProcessId</DocProcessId>
+					</Parameters>
+					<DataMember>BizProcess_UserIdList,BizProcess_RoleList</DataMember>
+					<Expr>!Empty(RowId_DocProcess)</Expr>
+					<Text />
+				</Eval_BizProcess_UserIdList_GetValue>
+				<Eval_GetDataFromChild>
+					<ClassName>BravoCopyValue</ClassName>
+					<CopyValues>
+						<DebitAccount>VLOOKUP(Child(Ct0), DebitAccount, !Empty(DebitAccount))</DebitAccount>
+						<CreditAccount>VLOOKUP(Child(Ct0), CreditAccount, !Empty(CreditAccount))</CreditAccount>
+						<BizDocId_LC>IIF(UsingBizDocId_LC=1,VLOOKUP(Child(Ct0), BizDocId_LC, !Empty(BizDocId_LC)),NULL)</BizDocId_LC>
+						<!--22/05/19: Vũ LA thêm Hợp đồng tiền gửi-->
+						<BizDocId_DA>IIF(UsingBizDocId_DA=1,VLOOKUP(Child(Ct0), BizDocId_DA, !Empty(BizDocId_DA)),NULL)</BizDocId_DA>
+						<!--12/05/22: ĐứcCM thêm theo dõi phát sinh giảm bảo lãnh, L/C-->
+						<BizDocId_G2>IIF(UsingBizDocId_G2=1,VLOOKUP(Child(Ct0), BizDocId_G2, !Empty(BizDocId_G2)),NULL)</BizDocId_G2>
+						<BizDocId_G3>IIF(UsingBizDocId_G3=1,VLOOKUP(Child(Ct0), BizDocId_G3, !Empty(BizDocId_G3)),NULL)</BizDocId_G3>
+						<CashInBankAccount>IIF(DocGroup='1',VLOOKUP(Child(Ct0), DebitAccount, !Empty(DebitAccount)),VLOOKUP(Child(Ct0), CreditAccount, !Empty(CreditAccount)))</CashInBankAccount>
+						<AttachedTaxInfo>IIF(Exists(AtchDoc,!Empty(TaxCode)) OR Exists(AtchDocE3,!Empty(TaxCode)),1,0)</AttachedTaxInfo>
+						<TotalAmount_BeforeEdit0>TotalAmount</TotalAmount_BeforeEdit0>
+						<RowId_AtchPurchase>IIF(UsingRowId_AtchPurchase=1,VLOOKUP(Child(Ct0), RowId_AtchPurchase, !Empty(RowId_AtchPurchase)),NULL)</RowId_AtchPurchase>
+					</CopyValues>
+				</Eval_GetDataFromChild>
+				<Eval_TransCode_BindingMember>
+					<ClassName>BravoBindingMember</ClassName>
+					<DataMember>TransCode</DataMember>
+					<LookupKey>Trans</LookupKey>
+					<bindingMembers>
+						<CheckExpenseCatgId>CheckExpenseCatgId</CheckExpenseCatgId>
+						<CheckDeptId>CheckDeptId</CheckDeptId>
+						<CheckBizDocId_PO>CheckBizDocId_PO</CheckBizDocId_PO>
+						<CheckBizDocId_SO>CheckBizDocId_SO</CheckBizDocId_SO>
+						<CheckJobId>CheckJobId</CheckJobId>
+						<Account>Account_Trans</Account>
+						<IsPostGL>IsPostGL</IsPostGL>
+						<CheckCostCentre>CheckCostCentre</CheckCostCentre>
+						<CheckCashFlowId>CheckCashFlowId</CheckCashFlowId>
+					</bindingMembers>
+					<FilterKey>{=BranchFilter('BranchCode')}</FilterKey>
+					<Expr>!Empty(TransCode) AND UsingTransCode=1</Expr>
+				</Eval_TransCode_BindingMember>
+				<Eval_CreditAccount_BindingMember>
+					<ClassName>BravoBindingMember</ClassName>
+					<bindingMembers>
+						<BankAccount>BankAccount</BankAccount>
+					</bindingMembers>
+					<LookupKey>ChartOfAccount</LookupKey>
+					<DataMember>CreditAccount</DataMember>
+					<FilterKey>IsGroup=0 AND IsParentAccount=0</FilterKey>
+				</Eval_CreditAccount_BindingMember>
+				<Eval_BankAccountNo_BindingMember>
+					<ClassName>BravoBindingMember</ClassName>
+					<bindingMembers>
+						<BankName>BankName</BankName>
+					</bindingMembers>
+					<LookupKey>BankAccount</LookupKey>
+					<DataMember>BankAccountNo</DataMember>
+					<Expr>BankAccountNo&lt;&gt;''</Expr>
+					<FilterKey>GLAccount='{=CashInBankAccount}'</FilterKey>
+				</Eval_BankAccountNo_BindingMember>
+				<Eval_Ct0_ExchangeRate_LC_GetValue>Exists(Child(Ct0), !Empty(BizDocId_LC))</Eval_Ct0_ExchangeRate_LC_GetValue>
+				<Eval_MoneyDiffValue_GetValue />
+				<Eval_Ct0_GetDataFromChild />
+				<Eval_CheckProductAccount_GetValueFromChild>UsingProductId=1</Eval_CheckProductAccount_GetValueFromChild>
+				<Eval_GetTransInfoFromChild>
+					<ClassName>BravoCopyValue</ClassName>
+					<Expr>UsingTransCode=2</Expr>
+					<CopyValues>
+						<CheckExpenseCatgId>IIF(Exists(Child(Ct0),!Empty(CheckExpenseCatgId)),1,NULL)</CheckExpenseCatgId>
+						<CheckDeptId>IIF(Exists(Child(Ct0),!Empty(CheckDeptId)),1,NULL)</CheckDeptId>
+						<CheckJobId>IIF(Exists(Child(Ct0),!Empty(CheckJobId)),1,NULL)</CheckJobId>
+						<CheckBizDocId_PO>IIF(Exists(Child(Ct0),!Empty(CheckBizDocId_PO)),1,NULL)</CheckBizDocId_PO>
+						<CheckBizDocId_SO>IIF(Exists(Child(Ct0),!Empty(CheckBizDocId_SO)),1,NULL)</CheckBizDocId_SO>
+						<CheckCostCentre>IIF(Exists(Child(Ct0),!Empty(CheckCostCentre)),1,NULL)</CheckCostCentre>
+						<CheckCashFlowId>IIF(Exists(Child(Ct0),!Empty(CheckCashFlowId)),1,NULL)</CheckCashFlowId>
+					</CopyValues>
+				</Eval_GetTransInfoFromChild>
+				<!--Ngân hàng điện tử-->
+				<Eval_BankAccountNoA_BindingMembers>
+					<bindingMembers>
+						<IsEBankingAccount>IsEBankingAccount</IsEBankingAccount>
+						<OtherCode>BankCodeA</OtherCode>
+					</bindingMembers>
+					<ClassName>BravoBindingMember</ClassName>
+					<LookupKey>BankAccount</LookupKey>
+					<DataMember>BankAccountNoA</DataMember>
+					<FilterKey>GLAccount LIKE '{=Isnull(CashInBankAccount, '%')}'</FilterKey>
+				</Eval_BankAccountNoA_BindingMembers>
+				<Eval_Check_IsCreated>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>ufn_B30AccDoc_Check_IsCreated</Command>
+					<Parameters>Stt</Parameters>
+					<DataMember>IsCreated</DataMember>
+					<Expr>IsEBankingAccount=1</Expr>
+					<Text />
+				</Eval_Check_IsCreated>
+				<Eval_DocBooking_BindingMember>
+					<ClassName>BravoBindingMember</ClassName>
+					<DataMember>DocBookingId</DataMember>
+					<LookupKey>DocBooking</LookupKey>
+					<SelectKey>IsGroup=0</SelectKey>
+					<bindingMembers>
+						<DocBookingDate>DocBookingDate</DocBookingDate>
+					</bindingMembers>
+				</Eval_DocBooking_BindingMember>
+				<!-- 17/03/2025 Chamvt bổ sung binding -->
+				<Eval_Ct0_DebitAccount_BindingMember />
+				<!-- 03/06/2021 ThắngĐQ: Tk nợ hạch toán ngân hàng trong chi tiết -->
+				<Eval_CashInDebitBankAccount_GetValue />
+				<!-- 11/06/2021: Anhpk lên thêm số dư theo BankAccId cho TK là loại TK ngân hàng-->
+				<Eval_Ct0_BeneficiaryBankAccId_DefaultValueFromParent />
+				<!-- 28/06/2021 ANHPK bắt thêm điều kiện BeneficiaryBankAccId-->
+				<Eval_Ct0_CashInDebitBankAccount_DefaultValueFromParent />
+				<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+				<Eval_AtchDoc_DebitAccount_BindingMember />
+				<Eval_AtchDoc_CreditAccount_BindingMember />
+				<Eval_Atch_GetTransInfoFromParent />
+				<Eval_AtchDoc_ButtEInvoiceLink_DefaultValue />
+				<Eval_Ct0_ButtEInvoiceLink_DefaultValue />
+				<Eval_CheckWorkProcess_SetValue />
+				<!--26/02/25 KhanhDq: Thêm bankcodeB-->
+				<Eval_BeneficiaryBankId_BindingMembers_BankCode>
+					<ClassName>BravoBindingMember</ClassName>
+					<bindingMembers>
+						<OtherCode>BankCodeB</OtherCode>
+					</bindingMembers>
+					<LookupKey>Bank</LookupKey>
+					<DataMember>BeneficiaryBankId</DataMember>
+				</Eval_BeneficiaryBankId_BindingMembers_BankCode>
+				<Eval_BankPaymentType_GetData />
+				<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+				<Eval_UsingIsDraftData_SetValue />
+			</ServerLoaded>
+			<RowAdded>
+				<Eval_DocCode_BindingMembers>
+					<ClassName>BravoBindingMember</ClassName>
+					<bindingMembers>
+						<TransTypeCode>TransTypeCode</TransTypeCode>
+						<Nh_Ct>DocGroup</Nh_Ct>
+						<Ma_Nvu>Ma_Nvu</Ma_Nvu>
+						<Ma_Gd_Ct>TransCode</Ma_Gd_Ct>
+						<Tk_No_Ct>DebitAccount</Tk_No_Ct>
+						<Tk_Co_Ct>CreditAccount</Tk_Co_Ct>
+						<TaxType_Ct>TaxType_Ct</TaxType_Ct>
+						<DocStatus_Ct>DocStatus</DocStatus_Ct>
+						<ExchangeRateType_Ct>ExchangeRateType</ExchangeRateType_Ct>
+						<UsingExpenseCatgId>UsingExpenseCatgId</UsingExpenseCatgId>
+						<UsingDeptId>UsingDeptId</UsingDeptId>
+						<UsingEmployeeId>UsingEmployeeId</UsingEmployeeId>
+						<UsingProductId>UsingProductId</UsingProductId>
+						<UsingBizDocId_PO>UsingBizDocId_PO</UsingBizDocId_PO>
+						<UsingBizDocId_SO>UsingBizDocId_SO</UsingBizDocId_SO>
+						<UsingTransCode>UsingTransCode</UsingTransCode>
+						<UsingWorkProcessId>UsingWorkProcessId</UsingWorkProcessId>
+						<UsingCostCentreId>UsingCostCentreId</UsingCostCentreId>
+						<UsingAccount>UsingAccount</UsingAccount>
+						<UsingCrspAccount>UsingCrspAccount</UsingCrspAccount>
+						<UsingBizDocId_LC>UsingBizDocId_LC</UsingBizDocId_LC>
+						<UsingBizDocId_DA>UsingBizDocId_DA</UsingBizDocId_DA>
+						<UsingBizDocId_G2>UsingBizDocId_G2</UsingBizDocId_G2>
+						<UsingBizDocId_G3>UsingBizDocId_G3</UsingBizDocId_G3>
+						<UsingRemitInfo>UsingRemitInfo</UsingRemitInfo>
+						<UsingJobId>UsingJobId</UsingJobId>
+						<DocumentViewStyle>DocumentViewStyle</DocumentViewStyle>
+						<AutoPrintVoucher>AutoPrintVoucher</AutoPrintVoucher>
+						<Ten_Ct>DocName</Ten_Ct>
+						<DocCodeNumbering>DocCodeNumbering</DocCodeNumbering>
+						<AutoNumbering>AutoNumbering</AutoNumbering>
+						<UsingCustomFieldId1>UsingCustomFieldId1</UsingCustomFieldId1>
+						<UsingCustomFieldId2>UsingCustomFieldId2</UsingCustomFieldId2>
+						<UsingCustomFieldId3>UsingCustomFieldId3</UsingCustomFieldId3>
+						<UsingCashFlowId>UsingCashFlowId</UsingCashFlowId>
+						<!--29/02/2024 PhanNH: Thêm trường đề nghị thanh toán-->
+						<UsingBizDocId_PA>UsingBizDocId_PA</UsingBizDocId_PA>
+						<UsingBizDocId_AR>UsingBizDocId_AR</UsingBizDocId_AR>
+						<UsingRowId_AtchPurchase>UsingRowId_AtchPurchase</UsingRowId_AtchPurchase>
+						<!--29/05/2024 thêm khoản mục dòng tiền tài chính để lên DL báo cáo LCTT, TMBCTC-->
+						<UsingNoteFactorId>UsingNoteFactorId</UsingNoteFactorId>
+					</bindingMembers>
+					<LookupKey>DmCt</LookupKey>
+					<DataMember>DocCode</DataMember>
+				</Eval_DocCode_BindingMembers>
+				<Eval_DocNo_DefaultValue>EMPTY(AutoNumbering)</Eval_DocNo_DefaultValue>
+				<Eval_DocCodeUserId_BindingMembers />
+				<Eval_MoneyDiffValue_GetValue />
+				<Eval_CashInBankAccount_DefaultValue>UsingAccount=1</Eval_CashInBankAccount_DefaultValue>
+				<Eval_BankPaymentType_GetData />
+				<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+				<Eval_UsingIsDraftData_SetValue />
+			</RowAdded>
+			<RowCopied>
+				<Eval_UserId_DefaultValue>
+					<DataMember>UserId</DataMember>
+					<Value>USER('Id')</Value>
+				</Eval_UserId_DefaultValue>
+				<Eval_DocCode_BindingMembers_WhenCopy>
+					<ClassName>BravoBindingMember</ClassName>
+					<bindingMembers>
+						<AutoPrintVoucher>AutoPrintVoucher</AutoPrintVoucher>
+						<DocStatus_Ct>DocStatus</DocStatus_Ct>
+						<AutoNumbering>AutoNumbering</AutoNumbering>
+					</bindingMembers>
+					<LookupKey>DmCt</LookupKey>
+					<DataMember>DocCode</DataMember>
+				</Eval_DocCode_BindingMembers_WhenCopy>
+				<Eval_DocNo_ResetValue>
+					<DataMember>DocNo</DataMember>
+					<Value>NULL</Value>
+					<Expr>Empty(Stt)</Expr>
+					<bSuppressChangeEvents>True</bSuppressChangeEvents>
+				</Eval_DocNo_ResetValue>
+				<Eval_DocDate_ResetValue>
+					<DataMember>DocDate</DataMember>
+					<Value>GETDATE()</Value>
+				</Eval_DocDate_ResetValue>
+				<Eval_FiscalYear_ResetValue>
+					<DataMember>FiscalYear</DataMember>
+					<Expr>FiscalYear&lt;&gt;FISCALYEAR()</Expr>
+					<Value>FISCALYEAR()</Value>
+				</Eval_FiscalYear_ResetValue>
+				<Eval_DocNo_DefaultValue>Empty(DocNo) AND EMPTY(AutoNumbering)</Eval_DocNo_DefaultValue>
+				<Eval_DocCodeUserId_BindingMembers />
+				<Eval_DocStatusDefault_DefaultFromUser />
+				<Eval_DocStatus_BindingMembers_WhenCopy>
+					<ClassName>BravoBindingMember</ClassName>
+					<bindingMembers>
+						<IsCancelled>IsCancelled</IsCancelled>
+						<PostGL>PostGL</PostGL>
+						<Lock>Lock</Lock>
+					</bindingMembers>
+					<LookupKey>DocStatus</LookupKey>
+					<DataMember>DocStatus</DataMember>
+				</Eval_DocStatus_BindingMembers_WhenCopy>
+				<Eval_BizProcessGroup_ResetValue>
+					<DataMember>RowId_DocProcess,DocProcessId</DataMember>
+					<Value>NULL</Value>
+				</Eval_BizProcessGroup_ResetValue>
+				<!--Ngân hàng điện tử-->
+				<Eval_EBankingStatus_ResetValue>
+					<DataMember>EBankingStatus</DataMember>
+					<Value>0</Value>
+				</Eval_EBankingStatus_ResetValue>
+				<Eval_EBankingId_ResetValue>
+					<DataMember>EBankingId,EBankingDate</DataMember>
+					<Value>NULL</Value>
+				</Eval_EBankingId_ResetValue>
+				<!-- 03/06/2021 ThắngĐQ: Tk nợ hạch toán ngân hàng trong chi tiết -->
+				<Eval_CashInDebitBankAccount_GetValue />
+				<!-- 28/06/2021 ANHPK bắt thêm điều kiện BeneficiaryBankAccId-->
+				<Eval_Ct0_CashInDebitBankAccount_DefaultValueFromParent />
+				<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+				<Eval_UsingIsDraftData_SetValue />
+				<Eval_IsDraftData_ResetValue />
+				<!--26/08/2024 PhanNH Thêm trạng thái duyệt cho chứng từ-->
+				<Eval_ApprovalStatus_ResetValue>
+					<DataMember>ApprovalStatus</DataMember>
+					<Value>NULL</Value>
+				</Eval_ApprovalStatus_ResetValue>
+			</RowCopied>
+			<ColumnChanging>
+				<CurrencyCode>
+					<Eval_ExchangeRate_ResetIfChangeByUser>
+						<DataMember>ExchangeRate_Currency,ExchangeRate</DataMember>
+						<Value>NULL</Value>
+						<bSuppressChangeEvents>True</bSuppressChangeEvents>
+					</Eval_ExchangeRate_ResetIfChangeByUser>
+				</CurrencyCode>
+				<CustomerId>
+					<Eval_Ct0_TaxRegNo_ClearIfSameAsParent />
+					<Eval_Ct0_TaxRegName_ClearIfSameAsParent />
+					<Eval_CustomerId_ResetIfChangeByUser>
+						<!--03/11/2020: PhongNVT chuyển C1,C2 thành PO,SO-->
+						<DataMember>CustomerName,CustomerType,Person_Customer,TaxRegNo_Customer,Person,Address,BizdocId_SO,BizdocId_PO</DataMember>
+						<Value>NULL</Value>
+						<bSuppressChangeEvents>True</bSuppressChangeEvents>
+					</Eval_CustomerId_ResetIfChangeByUser>
+					<Eval_Ct0_CustomerId_ClearIfSameAsParent />
+				</CustomerId>
+				<Description>
+					<Eval_Ct0_Description0_ClearIfSameAsParent />
+				</Description>
+				<CreditAccount>
+					<Eval_Ct0_CreditAccount_ClearIfSameAsParent />
+					<Eval_Ct0_CreditAccount3_ClearIfSameAsParent />
+					<Eval_BankAccountNoA_ResetIfChangeByUser />
+					<!-- 19/04/2021 ThắngĐQ: Thêm cột lưu mã Id theo dõi ngân hàng -->
+					<Eval_BankAccId_ResetIfChangeByUser>
+						<DataMember>BankAccId</DataMember>
+						<Expr>ISNULL(UsingAccount,0)=1</Expr>
+						<bSuppressChangeEvents>True</bSuppressChangeEvents>
+					</Eval_BankAccId_ResetIfChangeByUser>
+				</CreditAccount>
+				<DocDate>
+					<Eval_DocNo_ResetValue />
+				</DocDate>
+				<DeptId>
+					<Eval_DocNo_DefaultValue />
+				</DeptId>
+			</ColumnChanging>
+			<ColumnChanged>
+				<DocDate>
+					<Eval_Ct0_DocDate_DefaultValueFromParent />
+					<Eval_Ct0_DateDue_AutoValue />
+					<Eval_ExchangeRate_Currency_Default />
+					<Eval_DocNo_DefaultValue>Empty(DocNo) AND EMPTY(AutoNumbering)</Eval_DocNo_DefaultValue>
+					<!-- 04/04/2019 ThắngĐQ: Khi đổi ngày chứng từ thì cập nhật lại tỷ giá khế ước -->
+					<Eval_Ct0_ExchangeRate_LC_GetValue>Exists(Child(Ct0), !Empty(BizDocId_LC))</Eval_Ct0_ExchangeRate_LC_GetValue>
+					<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+					<Eval_UsingIsDraftData_SetValue />
+				</DocDate>
+				<DocNo>
+					<Eval_DocNo_DefaultValue>Empty(DocNo) AND EMPTY(AutoNumbering)</Eval_DocNo_DefaultValue>
+				</DocNo>
+				<Description>
+					<Eval_Ct0_Description0_DefaultValueFromParent />
+				</Description>
+				<CustomerId>
+					<Eval_Ct0_CustomerId_DefaultValueFromParent />
+				</CustomerId>
+				<CustomerName>
+					<Eval_Ct0_TaxRegName_DefaultValue />
+					<Eval_Person_DefaultValue />
+				</CustomerName>
+				<Person_Customer>
+					<Eval_Person_DefaultValue />
+				</Person_Customer>
+				<DeptId>
+					<Eval_Ct0_DeptId_DefaultValueFromParent />
+					<Eval_DocNo_DefaultValue>Empty(DocNo) AND EMPTY(AutoNumbering)</Eval_DocNo_DefaultValue>
+				</DeptId>
+				<JobId>
+					<Eval_Ct0_JobId_DefaultValueFromParent />
+				</JobId>
+				<DebitAccount>
+					<Eval_Ct0_DebitAccount_DefaultValue />
+				</DebitAccount>
+				<CreditAccount>
+					<Eval_Ct0_CreditAccount_DefaultValue />
+					<!--26/02/2019 ChamVt Sửa lỗi Thêm mới báo nợ: TK có = trắng, không lấy dc theo khai báo tk có ngầm định trong danh mục chứng từ-->
+					<Eval_CashInBankAccount_DefaultValue>UsingAccount=1</Eval_CashInBankAccount_DefaultValue>
+					<Eval_AtchDoc_CreditAccount_DefaultValue />
+				</CreditAccount>
+				<BankAccount>
+					<!-- 19/04/2021 ThắngĐQ: Thêm cột lưu mã Id theo dõi ngân hàng -->
+					<Eval_BankAccId_AutoValue>
+						<DataMember>BankAccId</DataMember>
+						<Value>IIF(ISNULL(BankAccount,0)=1,BankAccId,NULL)</Value>
+					</Eval_BankAccId_AutoValue>
+				</BankAccount>
+				<!-- 19/04/2021 ThắngĐQ: Thêm cột lưu mã Id theo dõi ngân hàng -->
+				<BankAccId>
+					<Eval_Ct0_RunningAverageExchangeRate_ResetIfChangeByUser />
+					<Eval_Ct0_BankAccId_DefaultValueFromParent />
+				</BankAccId>
+				<TransCode>
+					<Eval_Ct0_TransCode_DefaultValueFromParent />
+				</TransCode>
+				<ExpenseCatgId>
+					<Eval_Ct0_ExpenseCatgId_DefaultValueFromParent />
+				</ExpenseCatgId>
+				<EmployeeId>
+					<Eval_Ct0_EmployeeId_DefaultValueFromParent />
+				</EmployeeId>
+				<ProductId>
+					<Eval_Ct0_ProductId_DefaultValueFromParent />
+				</ProductId>
+				<!--03/11/2020: PhongNVT chuyển cách lấy số liệu từ C1, C2 sang PO, SO
+                <BizDocId_C2>
+                    <Eval_Ct0_BizDocId_C2_DefaultValueFromParent />
+                </BizDocId_C2>
+                <BizDocId_C1>
+                    <Eval_Ct0_BizDocId_C1_DefaultValueFromParent />
+                </BizDocId_C1-->
+				<BizDocId_LC>
+					<Eval_Ct0_BizDocId_LC_DefaultValueFromParent />
+				</BizDocId_LC>
+				<!--22/05/19: Vũ LA thêm Hợp đồng tiền gửi-->
+				<BizDocId_DA>
+					<Eval_Ct0_BizDocId_DA_DefaultValueFromParent />
+				</BizDocId_DA>
+				<!--12/05/22: ĐứcCM thêm theo dõi phát sinh giảm bảo lãnh, L/C-->
+				<BizDocId_G2>
+					<Eval_Ct0_BizDocId_G2_DefaultValueFromParent />
+				</BizDocId_G2>
+				<BizDocId_G3>
+					<Eval_Ct0_BizDocId_G3_DefaultValueFromParent />
+				</BizDocId_G3>
+				<BizDocId_PO>
+					<Eval_Ct0_BizDocId_PO_DefaultValueFromParent />
+				</BizDocId_PO>
+				<BizDocId_SO>
+					<Eval_Ct0_BizDocId_SO_DefaultValueFromParent />
+				</BizDocId_SO>
+				<TaxRegNo_Customer>
+					<Eval_Ct0_TaxRegNo_DefaultValue />
+				</TaxRegNo_Customer>
+				<Person>
+					<Eval_Person_DefaultValue />
+				</Person>
+				<CurrencyCode>
+					<Eval_ExchangeRate_EditWhen>
+						<DataMember>ExchangeRate</DataMember>
+						<Controls>
+							<Enabled>CurrencyCode&lt;&gt;CONFIG('M_Ma_Tte0')</Enabled>
+						</Controls>
+					</Eval_ExchangeRate_EditWhen>
+					<Eval_CurrencyCode0_VisibleWhen>
+						<DataMember>TotalOriginalAmount0</DataMember>
+						<Controls>
+							<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+							<Name>BravoGridContainer.Item_Detail.Amount9.Amount7.DebitAccount7.CreditAccount7.Amount8.DebitAccount8.CreditAccount8.BookingExchangeRate.UnitCost,BravoGridContainer.Item_AtchDoc.AmountBeforeTax.Amount.UnitCost</Name>
+							<Visible>CurrencyCode&lt;&gt;CONFIG('M_Ma_Tte0')</Visible>
+						</Controls>
+					</Eval_CurrencyCode0_VisibleWhen>
+					<Eval_DocumentTaxed_VisibleAmount3 />
+					<Eval_Ct0_RunningAverageExchangeRate />
+					<Eval_MoneyDiffValue_GetValue />
+				</CurrencyCode>
+				<Id_Currency>
+					<Eval_ExchangeRate_Currency_Default />
+				</Id_Currency>
+				<ExchangeRate_Currency>
+					<Eval_ExchangeRate_DefaultValue />
+				</ExchangeRate_Currency>
+				<ExchangeRate>
+					<Eval_ExchangeRate_Currency_Default>Empty(ExchangeRate) AND Empty(ExchangeRate_Currency)</Eval_ExchangeRate_Currency_Default>
+					<Eval_ExchangeRate_DefaultValue>Empty(ExchangeRate)</Eval_ExchangeRate_DefaultValue>
+					<Eval_Ct0_BookingExchangeRate_AutoValue />
+					<Eval_Ct0_Amount9 />
+					<Eval_Ct0_Amount3 />
+					<Eval_Ct0_Amount7 />
+					<Eval_Ct0_Amount8 />
+					<Eval_AtchDoc_AmountBeforeTax />
+					<Eval_AtchDoc_Amount />
+					<Eval_Ct0_DebitAccount7_AutoValue />
+					<Eval_Ct0_CreditAccount7_AutoValue />
+					<Eval_Ct0_DebitAccount8_AutoValue />
+					<Eval_Ct0_CreditAccount8_AutoValue />
+					<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+					<Eval_Ct0_UnitCost />
+					<Eval_AtchDoc_UnitCost />
+				</ExchangeRate>
+				<DecimalRound>
+					<Eval_Ct0_OriginalAmount9_IfChangeDecimalRound />
+					<Eval_Ct0_OriginalAmount_IfChangeDecimalRound />
+					<Eval_Ct0_OriginalAmount3_IfChangeDecimalRound />
+					<Eval_CurrencyCode0_FormatWhen>
+						<DataMember>TotalOriginalAmount0,TotalOriginalAmount3,TotalOriginalAmount</DataMember>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.OriginalAmount9.OriginalAmount3,BravoGridContainer.Item_AtchDoc.OriginalAmount.OriginalAmountBeforeTax</Name>
+							<Format>FormatCurrency(CurrencyCode)</Format>
+						</Controls>
+					</Eval_CurrencyCode0_FormatWhen>
+				</DecimalRound>
+				<!--18/2/2021 PhanNH: Sửa OriginalPaymentAmount không làm tròn khi thay đổi CurrencyCode sang VND-->
+				<ExchangeRateOperator />
+				<IsCancelled>
+					<Eval_IsActive_AutoValue>
+						<DataMember>IsActive</DataMember>
+						<Value>IIF(IsCancelled=1,0,1)</Value>
+					</Eval_IsActive_AutoValue>
+				</IsCancelled>
+				<DocGroup>
+					<Eval_Detail_DebitAccount3_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.DebitAccount3</Name>
+							<Visible>DocGroup&lt;&gt;'1'</Visible>
+						</Controls>
+					</Eval_Detail_DebitAccount3_VisibleWhen>
+					<Eval_Detail_CreditAccount3_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.CreditAccount3</Name>
+							<Visible>DocGroup&lt;&gt;'2'</Visible>
+						</Controls>
+					</Eval_Detail_CreditAccount3_VisibleWhen>
+					<Eval_Ct0_DocGroup_DefaultFromParent />
+				</DocGroup>
+				<WorkProcessId>
+					<Eval_Ct0_WorkProcessId_DefaultValueFromParent />
+				</WorkProcessId>
+				<CostCentreId>
+					<Eval_Ct0_CostCentreId_DefaultValueFromParent />
+				</CostCentreId>
+				<TotalOriginalAmount0>
+					<Eval_TotalOriginalAmount />
+				</TotalOriginalAmount0>
+				<TotalOriginalAmount3>
+					<Eval_TotalOriginalAmount />
+				</TotalOriginalAmount3>
+				<TotalAmount0>
+					<Eval_TotalAmount />
+				</TotalAmount0>
+				<TotalAmount3>
+					<Eval_TotalAmount />
+					<Eval_AttachedTaxInfo />
+				</TotalAmount3>
+				<AttachedTaxInfo>
+					<Eval_VisibleTaxInfo>
+						<DataMember>TotalAmount,TotalAmount3</DataMember>
+						<Controls>
+							<Name>lblTotalOriginalAmount,lblTotalOriginalAmount3</Name>
+							<Visible>IsNull(AttachedTaxInfo,0)&lt;&gt;0</Visible>
+						</Controls>
+					</Eval_VisibleTaxInfo>
+					<Eval_VisibleTaxInfoE3>
+						<Controls>
+							<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+							<Name>BravoGridContainer.Item_Detail.TaxRate.AttachedDocNo.AttachedDocDate.AttachedDocFormNo.AttachedDocSerialNo.TaxRegNo.TaxRegName.EInvoiceLink.EInvoiceKey.ButtEInvoiceLink.Unit.Quantity.AtchDocOrder.ItemName.OriginalUnitCost</Name>
+							<Visible>IsNull(AttachedTaxInfo,0)&lt;&gt;0 AND Exists(Ct0, !Empty(TaxCode))</Visible>
+						</Controls>
+					</Eval_VisibleTaxInfoE3>
+					<Eval_DocumentTaxed_VisibleDebitAccount3>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.DebitAccount3</Name>
+							<Visible>IsNull(AttachedTaxInfo,0)&lt;&gt;0 AND DocGroup&lt;&gt;'1'</Visible>
+						</Controls>
+					</Eval_DocumentTaxed_VisibleDebitAccount3>
+					<Eval_DocumentTaxed_VisibleCreditAccount3>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.CreditAccount3</Name>
+							<Visible>IsNull(AttachedTaxInfo,0)&lt;&gt;0 AND DocGroup='1'</Visible>
+						</Controls>
+					</Eval_DocumentTaxed_VisibleCreditAccount3>
+					<Eval_DocumentTaxed_VisibleAmount3 />
+				</AttachedTaxInfo>
+				<DocumentViewStyle>
+					<Eval_DocumentViewStyle>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.DueDate</Name>
+							<Visible>IsNull(DocumentViewStyle,0)=0</Visible>
+						</Controls>
+					</Eval_DocumentViewStyle>
+				</DocumentViewStyle>
+				<DocStatusDefault>
+					<Eval_DocStatusDefault_DefaultFromUser />
+				</DocStatusDefault>
+				<DocumentViewStyleDefault>
+					<Eval_DocumentViewStyle_DefaultFromUser>
+						<DataMember>DocumentViewStyle</DataMember>
+						<Value>DocumentViewStyleDefault</Value>
+						<Expr>DocumentViewStyleDefault IS NOT NULL</Expr>
+					</Eval_DocumentViewStyle_DefaultFromUser>
+				</DocumentViewStyleDefault>
+				<IsPostGL>
+					<Eval_Posted_DefaultValue>
+						<DataMember>Posted</DataMember>
+						<Value>IsPostGL</Value>
+						<Expr>UsingTransCode=1</Expr>
+					</Eval_Posted_DefaultValue>
+				</IsPostGL>
+				<Account_Trans>
+					<Eval_Ct0_Account_Trans_GetValueFromParent>!Empty(Account_Trans) AND UsingTransCode=1</Eval_Ct0_Account_Trans_GetValueFromParent>
+				</Account_Trans>
+				<CheckExpenseCatgId>
+					<Eval_Ct0_CheckExpenseCatgId_GetValueFromParent>UsingExpenseCatgId=2 AND UsingTransCode=1</Eval_Ct0_CheckExpenseCatgId_GetValueFromParent>
+					<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+					<Eval_Atch_CheckExpenseCatgId_GetValueFromParent>UsingExpenseCatgId=2 AND UsingTransCode=1</Eval_Atch_CheckExpenseCatgId_GetValueFromParent>
+				</CheckExpenseCatgId>
+				<CheckDeptId>
+					<Eval_Ct0_CheckDeptId_GetValueFromParent>UsingDeptId=2 AND UsingTransCode=1</Eval_Ct0_CheckDeptId_GetValueFromParent>
+					<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+					<Eval_Atch_CheckDeptId_GetValueFromParent>UsingDeptId=2 AND UsingTransCode=1</Eval_Atch_CheckDeptId_GetValueFromParent>
+				</CheckDeptId>
+				<CheckJobId>
+					<Eval_Ct0_CheckJobId_GetValueFromParent>UsingJobId=2 AND UsingTransCode=1</Eval_Ct0_CheckJobId_GetValueFromParent>
+					<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+					<Eval_Atch_CheckJobId_GetValueFromParent>UsingJobId=2 AND UsingTransCode=1</Eval_Atch_CheckJobId_GetValueFromParent>
+				</CheckJobId>
+				<!--03/11/2020: PhongNVT chuyển cách lấy số liệu từ C1, C2 sang PO, SO
+                <CheckBizDocId_C1>
+                    <Eval_Ct0_CheckBizDocId_C1_GetValueFromParent>UsingBizDocId_C1=2 AND UsingTransCode=1</Eval_Ct0_CheckBizDocId_C1_GetValueFromParent>
+                </CheckBizDocId_C1>
+                <CheckBizDocId_C2>
+                    <Eval_Ct0_CheckBizDocId_C2_GetValueFromParent>UsingBizDocId_C2=2 AND UsingTransCode=1</Eval_Ct0_CheckBizDocId_C2_GetValueFromParent>
+                </CheckBizDocId_C2-->
+				<CheckBizDocId_PO>
+					<Eval_Ct0_CheckBizDocId_PO_GetValueFromParent>UsingBizDocId_PO=2 AND UsingTransCode=1</Eval_Ct0_CheckBizDocId_PO_GetValueFromParent>
+					<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+					<Eval_Atch_CheckBizDocId_PO_GetValueFromParent>UsingBizDocId_PO=2 AND UsingTransCode=1</Eval_Atch_CheckBizDocId_PO_GetValueFromParent>
+				</CheckBizDocId_PO>
+				<CheckBizDocId_SO>
+					<Eval_Ct0_CheckBizDocId_SO_GetValueFromParent>UsingBizDocId_SO=2 AND UsingTransCode=1</Eval_Ct0_CheckBizDocId_SO_GetValueFromParent>
+					<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+					<Eval_Atch_CheckBizDocId_SO_GetValueFromParent>UsingBizDocId_SO=2 AND UsingTransCode=1</Eval_Atch_CheckBizDocId_SO_GetValueFromParent>
+				</CheckBizDocId_SO>
+				<PostGL>
+					<Eval_DocStatus_SetStyle>
+						<DataMember>DocStatus</DataMember>
+						<Controls>
+							<Style>IIF(PostGL=0 OR IsCancelled=1,'ForeColor:Red;','ForeColor:Blue;');</Style>
+						</Controls>
+					</Eval_DocStatus_SetStyle>
+				</PostGL>
+				<AutoNumbering>
+					<Eval_DocNo_EnabledWhen>
+						<DataMember>DocNo</DataMember>
+						<Controls>
+							<Enabled>EMPTY(AutoNumbering)</Enabled>
+						</Controls>
+					</Eval_DocNo_EnabledWhen>
+				</AutoNumbering>
+				<!--Ngân hàng điện tử-->
+				<IsEBankingAccount>
+					<Eval_VisibleEBankingPanel />
+					<Eval_BeneficiaryBankId_BindingMember />
+					<Eval_BankPaymentType_GetData />
+				</IsEBankingAccount>
+				<CustomFieldId1>
+					<Eval_Ct0_CustomFieldId1_DefaultValueFromParent />
+				</CustomFieldId1>
+				<CustomFieldId2>
+					<Eval_Ct0_CustomFieldId2_DefaultValueFromParent />
+				</CustomFieldId2>
+				<CustomFieldId3>
+					<Eval_Ct0_CustomFieldId3_DefaultValueFromParent />
+				</CustomFieldId3>
+				<CheckCostCentre>
+					<Eval_Ct0_CheckCostCentre_GetValueFromParent>UsingCostCentreId=2 AND UsingTransCode=1</Eval_Ct0_CheckCostCentre_GetValueFromParent>
+					<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+					<Eval_Atch_CheckCostCentreId_GetValueFromParent>UsingCostCentreId=2 AND UsingTransCode=1</Eval_Atch_CheckCostCentreId_GetValueFromParent>
+				</CheckCostCentre>
+				<!-- 11/06/2021: Anhpk lên thêm số dư theo BankAccId cho TK là loại TK ngân hàng-->
+				<BeneficiaryBankAccId>
+					<Eval_Ct0_BeneficiaryBankAccId_DefaultValueFromParent />
+				</BeneficiaryBankAccId>
+				<CashInDebitBankAccount>
+					<!--07/03/2022 PhongNVT sửa Eval_BankAccountNoB_BindingMembers thay vì Eval_BankAccountNoB_ResetValue sửa lỗi Import không binding được dữ liệu-->
+					<Eval_BankAccountNoB_BindingMembers />
+					<Eval_Ct0_CashInDebitBankAccount_DefaultValueFromParent />
+				</CashInDebitBankAccount>
+				<BankAccountNoB>
+					<Eval_BankAccountNoB_BindingMembers />
+				</BankAccountNoB>
+				<CashFlowId>
+					<Eval_Ct0_CashFlowId_DefaultValueFromParent />
+				</CashFlowId>
+				<CheckCashFlowId>
+					<Eval_Ct0_CheckCashFlowId_GetValueFromParent>UsingCashFlowId=2 AND UsingTransCode=1</Eval_Ct0_CheckCashFlowId_GetValueFromParent>
+					<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+					<Eval_Atch_CheckCashFlowId_GetValueFromParent>UsingCashFlowId=2 AND UsingTransCode=1</Eval_Atch_CheckCashFlowId_GetValueFromParent>
+				</CheckCashFlowId>
+				<BeneficiaryBankId>
+					<Eval_BeneficiaryBankId_BindingMember />
+				</BeneficiaryBankId>
+				<RowId_AtchPurchase>
+					<Eval_Ct0_RowId_AtchPurchase_DefaultValueFromParent />
+				</RowId_AtchPurchase>
+				<!--29/05/2024 thêm khoản mục dòng tiền tài chính để lên DL báo cáo LCTT, TMBCTC-->
+				<NoteFactorId>
+					<Eval_Ct0_NoteFactorId_DefaultValueFromParent />
+				</NoteFactorId>
+				<BankCodeA>
+					<Eval_BankPaymentType_GetData />
+					<Eval_PaymentType_ResetValue />
+				</BankCodeA>
+				<BankCodeB>
+					<Eval_BankPaymentType_GetData />
+					<Eval_PaymentType_ResetValue />
+				</BankCodeB>
+				<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+				<UsingIsDraftData>
+					<Eval_IsDraftData_VisibleWhen>
+						<DataMember>IsDraftData</DataMember>
+						<Controls>
+							<Visible>!Empty(UsingIsDraftData)</Visible>
+						</Controls>
+					</Eval_IsDraftData_VisibleWhen>
+				</UsingIsDraftData>
+			</ColumnChanged>
+			<Evaluators>
+				<Eval_Report_CurrentBalance>
+					<ClassName>BravoCommandKey</ClassName>
+					<CommandKey>REP00_CurrentBal</CommandKey>
+					<!-- 19/04/2021 ThắngĐQ: Thêm cột lưu mã Id theo dõi ngân hàng -->
+					<zCtorArgs>DocDate='{=DocDate}';CurrencyCode='{=CurrencyCode}';DetailData='{=GETXMLDATA('Ct0', 'DocCode,DebitAccount,CreditAccount,CustomerId,ProductId,BankAccId,BeneficiaryBankAccId')}';StartupCommandKey=Refresh;</zCtorArgs>
+				</Eval_Report_CurrentBalance>
+				<Eval_OpenCashSale>
+					<ClassName>BravoCommandKey</ClassName>
+					<Command>HD</Command>
+				</Eval_OpenCashSale>
+				<Eval_MergeCashSale>
+					<ClassName>BravoServerConstraint</ClassName>
+					<DataMember>vB30AccDocCashPayment_Edit</DataMember>
+					<Command>usp_B30AccDocCashPayment_ConvertFromCashSales</Command>
+					<Text />
+				</Eval_MergeCashSale>
+				<Eval_ExchangeRate_DefaultValue>
+					<DataMember>ExchangeRate</DataMember>
+					<Expr>Empty(ExchangeRate) AND !Empty(ExchangeRate_Currency)</Expr>
+					<Value>ExchangeRate_Currency</Value>
+				</Eval_ExchangeRate_DefaultValue>
+				<Eval_Person_DefaultValue>
+					<DataMember>Person</DataMember>
+					<Expr>Empty(Person)</Expr>
+					<Value>IIF(!Empty(Person_Customer),Person_Customer,CustomerName)</Value>
+				</Eval_Person_DefaultValue>
+				<Eval_ExchangeRate_Currency_Default>
+					<DataMember>ExchangeRate_Currency</DataMember>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>ufn_B20Currency_GetExchangeRate</Command>
+					<Parameters>BranchCode,DocDate,Id_Currency,ExchangeRateType</Parameters>
+					<Text />
+				</Eval_ExchangeRate_Currency_Default>
+				<Eval_DocNo_DefaultValue>
+					<ClassName>BravoServerConstraint</ClassName>
+					<DataMember>DocNo</DataMember>
+					<Command>usp_B30AccDoc_DefaultDocNo</Command>
+					<dataAccessMode>Write</dataAccessMode>
+					<!--Parameters>BranchCode,Stt,DocCode,DocDate,RowId_VoucherRegister,DocNo</Parameters-->
+					<Parameters>
+						<BranchCode>BranchCode</BranchCode>
+						<Stt>Stt</Stt>
+						<DocCode>DocCode</DocCode>
+						<DocDate>DocDate</DocDate>
+						<RowId_VoucherRegister>RowId_VoucherRegister</RowId_VoucherRegister>
+						<DocNo>DocNo</DocNo>
+						<outputType>1</outputType>
+						<DeptId>DeptId</DeptId>
+					</Parameters>
+					<Text />
+				</Eval_DocNo_DefaultValue>
+				<Eval_TotalOriginalAmount0>
+					<DataMember>TotalOriginalAmount0</DataMember>
+					<Value>SUM(Child(Ct0).OriginalAmount)</Value>
+					<zResultDecimalRound>DecimalRound</zResultDecimalRound>
+				</Eval_TotalOriginalAmount0>
+				<Eval_TotalAmount0>
+					<DataMember>TotalAmount0</DataMember>
+					<Value>SUM(Child(Ct0).Amount)
+                                
+                                +ISNULL(SUM(Ct0,IIF(!Empty(Amount7) AND CreditAccount7=CreditAccount,Amount7,0)),0)</Value>
+					<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+				</Eval_TotalAmount0>
+				<Eval_TotalOriginalAmount3>
+					<DataMember>TotalOriginalAmount3</DataMember>
+					<Value>ISNULL(SUM(Child(Ct0).OriginalAmount3),0)+ISNULL(SUM(Child(AtchDoc).OriginalAmount),0)</Value>
+					<zResultDecimalRound>DecimalRound</zResultDecimalRound>
+				</Eval_TotalOriginalAmount3>
+				<Eval_TotalAmount3>
+					<DataMember>TotalAmount3</DataMember>
+					<Value>ISNULL(SUM(Child(Ct0).Amount3),0)
+                            +ISNULL(SUM(Child(AtchDoc).Amount),0)
+                            +ISNULL(SUM(Ct0,IIF(!Empty(Amount8) AND CreditAccount8=CreditAccount,Amount8,0)),0)</Value>
+					<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+				</Eval_TotalAmount3>
+				<Eval_TotalOriginalAmount>
+					<DataMember>TotalOriginalAmount</DataMember>
+					<Value>ISNULL(TotalOriginalAmount0,0)+ISNULL(TotalOriginalAmount3,0)</Value>
+					<zResultDecimalRound>DecimalRound</zResultDecimalRound>
+				</Eval_TotalOriginalAmount>
+				<Eval_TotalAmount>
+					<DataMember>TotalAmount</DataMember>
+					<Value>ISNULL(TotalAmount0,0)+ISNULL(TotalAmount3,0)</Value>
+					<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+				</Eval_TotalAmount>
+				<Eval_DocumentTaxed_VisibleAmount3>
+					<DataMember>TotalOriginalAmount,TotalOriginalAmount3</DataMember>
+					<Controls>
+						<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+						<Name>BravoGridContainer.Item_Detail.Amount3.UnitCost</Name>
+						<Visible>IsNull(AttachedTaxInfo,0)&lt;&gt;0 AND CurrencyCode&lt;&gt;CONFIG('M_Ma_Tte0')</Visible>
+					</Controls>
+				</Eval_DocumentTaxed_VisibleAmount3>
+				<Eval_AttachedTaxInfo_ResetValue>
+					<DataMember>AttachedTaxInfo</DataMember>
+					<Value>NULL</Value>
+					<bSuppressChangeEvents>True</bSuppressChangeEvents>
+				</Eval_AttachedTaxInfo_ResetValue>
+				<Eval_AttachedTaxInfo>
+					<DataMember>AttachedTaxInfo</DataMember>
+					<Value>IIF(Exists(Ct0,!Empty(TaxCode)) OR Exists(AtchDoc,!Empty(TaxCode)),1,0)</Value>
+				</Eval_AttachedTaxInfo>
+				<Eval_BankAccountNoB_DefaultValue>
+					<DataMember>BankAccountNoB</DataMember>
+					<Expr>Empty(BankAccountNoB)</Expr>
+					<Value>BankAccountNo_Customer</Value>
+				</Eval_BankAccountNoB_DefaultValue>
+				<Eval_BankAccountNoA_ResetIfChangeByUser>
+					<DataMember>BankAccountNoA</DataMember>
+					<Expr>ISNULL(UsingAccount,0)=1</Expr>
+					<Value>NULL</Value>
+					<bSuppressChangeEvents>False</bSuppressChangeEvents>
+				</Eval_BankAccountNoA_ResetIfChangeByUser>
+				<Eval_CashInBankAccount_DefaultValue>
+					<DataMember>CashInBankAccount,CreditAccount</DataMember>
+					<Value>IIF(UsingAccount=1,CreditAccount,Vlookup(Child(Ct0),CreditAccount))</Value>
+				</Eval_CashInBankAccount_DefaultValue>
+				<Eval_DocCodeUserId_BindingMembers>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>usp_B00DmCt_GetDefaultValue</Command>
+					<DataMember>DocStatusDefault,DocumentViewStyleDefault</DataMember>
+					<Parameters>
+						<DocCode>DocCode</DocCode>
+						<BranchCode>BranchCode</BranchCode>
+						<nUserId>UserId</nUserId>
+					</Parameters>
+					<Text />
+				</Eval_DocCodeUserId_BindingMembers>
+				<Eval_DocStatusDefault_DefaultFromUser>
+					<DataMember>DocStatus</DataMember>
+					<Value>ISNULL(DocStatusDefault,DocStatus)</Value>
+					<Expr>DocStatusDefault IS NOT NULL AND Empty(Stt)</Expr>
+				</Eval_DocStatusDefault_DefaultFromUser>
+				<Eval_MoneyDiffValue_GetValue>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>usp_B20Currency_GetMoneyDiff</Command>
+					<Parameters>CurrencyCode,BranchCode</Parameters>
+					<DataMember>MoneyDiffValue,VATDiffValue,MoneyDiffValue0,VATDiffValue0</DataMember>
+					<Text />
+				</Eval_MoneyDiffValue_GetValue>
+				<Eval_CheckProductAccount_GetValueFromChild>
+					<DataMember>CheckProductAccount</DataMember>
+					<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+					<Value>IIF(Exists(Child(Ct0),(!Empty(ProductDebitAccount) OR !Empty(ProductCreditAccount))),1,0)
+                                OR IIF(Exists(Child(AtchDoc),(!Empty(ProductDebitAccount_VAT) OR !Empty(ProductCreditAccount_VAT))),1,0)</Value>
+					<Expr>ISNULL(UsingProductId,0)=1</Expr>
+				</Eval_CheckProductAccount_GetValueFromChild>
+				<Eval_CheckExpenseCatgId_GetValueFromChild>
+					<DataMember>CheckExpenseCatgId</DataMember>
+					<Value>IIF(Exists(Child(Ct0),!Empty(CheckExpenseCatgId)),1,0)</Value>
+				</Eval_CheckExpenseCatgId_GetValueFromChild>
+				<Eval_CheckDeptId_GetValueFromChild>
+					<DataMember>CheckDeptId</DataMember>
+					<Value>IIF(Exists(Child(Ct0),!Empty(CheckDeptId)),1,0)</Value>
+				</Eval_CheckDeptId_GetValueFromChild>
+				<Eval_CheckJobId_GetValueFromChild>
+					<DataMember>CheckJobId</DataMember>
+					<Value>IIF(Exists(Child(Ct0),!Empty(CheckJobId)),1,0)</Value>
+				</Eval_CheckJobId_GetValueFromChild>
+				<Eval_CheckBizDocId_PO_GetValueFromChild>
+					<DataMember>CheckBizDocId_PO</DataMember>
+					<Value>IIF(Exists(Child(Ct0),!Empty(CheckBizDocId_PO)),1,0)</Value>
+				</Eval_CheckBizDocId_PO_GetValueFromChild>
+				<Eval_CheckBizDocId_SO_GetValueFromChild>
+					<DataMember>CheckBizDocId_SO</DataMember>
+					<Value>IIF(Exists(Child(Ct0),!Empty(CheckBizDocId_SO)),1,0)</Value>
+				</Eval_CheckBizDocId_SO_GetValueFromChild>
+				<!-- 23/12/20: ANHPK convert Đề nghị thanh toán từ B8 -->
+				<Eval_PaymentDetail_GetData>
+					<ClassName>BravoServerConstraint</ClassName>
+					<CommandKey>BizDocPA_Other</CommandKey>
+					<zCtorArgs>AutoSearch=True;FilterKey=DocDate&lt;='{=DocDate}' AND CustomerId='{=ISNULL(CustomerId, '')}' AND CurrencyCode='{=CurrencyCode}' AND PostGL=1 AND PaymentType='5';</zCtorArgs>
+					<Command>usp_B30AccDocCashPayment_ConvertFromB30BizDoc</Command>
+					<Parameters>
+						<IdList />
+					</Parameters>
+					<DataMember>Ct0</DataMember>
+					<!--16/06/2021 PhongNVT thêm IsCreated=0 ko cho thực hiện khi đã tạo gd Ebank-->
+					<Expr>!Empty(CustomerId) AND Empty(IsCreated)</Expr>
+					<zSourceValueMember>BizDocId</zSourceValueMember>
+					<zTargetValueMember>BizDocId_PA</zTargetValueMember>
+					<zSourceReturnMember>Id</zSourceReturnMember>
+					<Text />
+				</Eval_PaymentDetail_GetData>
+				<!--Ngân hàng điện tử-->
+				<Eval_VisibleEBankingPanel>
+					<DataMember>panelEBanking,BeneficiaryBankId</DataMember>
+					<Controls>
+						<Name>panelEBanking,lblBeneficiaryBankId</Name>
+						<Visible>ISNULL(IsEBankingAccount,0)=1</Visible>
+					</Controls>
+				</Eval_VisibleEBankingPanel>
+				<Eval_GridDetail_AllowAddNewWhen>
+					<Controls>
+						<Name>BravoGridContainer.Item_Detail,Item_AtchDoc</Name>
+						<AllowDelete>Empty(IsCreated)</AllowDelete>
+						<AllowAddNew>Empty(IsCreated)</AllowAddNew>
+					</Controls>
+				</Eval_GridDetail_AllowAddNewWhen>
+				<Eval_IsCreated_EnableWhen>
+					<DataMember>CustomerId,Person,CurrencyCode,BankAccountNoA,BankNameA,BankAccountNoB,BankNameB,BankBranchNameB,CityB,Description,CreditAccount,PaymentType,BeneficiaryBankId,BankCharge</DataMember>
+					<Controls>
+						<Name>Item_Detail.OriginalAmount9.TaxCode.OriginalAmount3.Item_AtchDoc.TaxCode.OriginalAmount.OriginalAmountBeforeTax</Name>
+						<Enabled>ISNULL(IsCreated,0)=0</Enabled>
+					</Controls>
+				</Eval_IsCreated_EnableWhen>
+				<Eval_CheckCostCentre_GetValueFromChild>
+					<DataMember>CheckCostCentre</DataMember>
+					<Value>IIF(Exists(Child(Ct0),!Empty(CheckCostCentre)),1,0)</Value>
+				</Eval_CheckCostCentre_GetValueFromChild>
+				<!-- 03/06/2021 ThắngĐQ: Tk nợ hạch toán ngân hàng trong chi tiết -->
+				<Eval_CashInDebitBankAccount_GetValue>
+					<DataMember>CashInDebitBankAccount</DataMember>
+					<Value>VLOOKUP(Ct0,DebitAccount,!Empty(BankDebitAccount))</Value>
+				</Eval_CashInDebitBankAccount_GetValue>
+				<!-- 28/06/2021 ANHPK bắt thêm điều kiện BeneficiaryBankAccId-->
+				<Eval_BankAccountNoB_BindingMembers>
+					<ClassName>BravoBindingMember</ClassName>
+					<bindingMembers>
+						<Id>BeneficiaryBankAccId</Id>
+						<Description>
+							<Condition_0>
+								<DataMember>BankNameB</DataMember>
+								<Expr>ISNULL(IsEBankingAccount,0)=0</Expr>
+							</Condition_0>
+						</Description>
+						<Province>
+							<Condition_0>
+								<DataMember>CityB</DataMember>
+								<Expr>ISNULL(IsEBankingAccount,0)=0</Expr>
+							</Condition_0>
+						</Province>
+						<BankBranchName>
+							<Condition_0>
+								<DataMember>BankBranchNameB</DataMember>
+								<Expr>ISNULL(IsEBankingAccount,0)=0</Expr>
+							</Condition_0>
+						</BankBranchName>
+						<BankId>BeneficiaryBankId</BankId>
+					</bindingMembers>
+					<LookupKey>BankAccount</LookupKey>
+					<!-- 03/06/2021 ThắngĐQ: Tk nợ hạch toán ngân hàng trong chi tiết -->
+					<FilterKey>BankAccountType={=IIF(Empty(CashInDebitBankAccount),1,0)} AND 
+                                    GLAccount='{=IIF(Empty(CashInDebitBankAccount),'',ISNULL(CashInDebitBankAccount,''))}' AND 
+                                    ISNULL(CustomerId,0)={=IIF(Empty(CashInDebitBankAccount),ISNULL(CustomerId,0),'ISNULL(CustomerId,0)')}</FilterKey>
+					<!--FilterKey>CustomerId='{=ISNULL(CustomerId,'')}' OR BankAccountType=0</FilterKey-->
+					<DataMember>BankAccountNoB</DataMember>
+				</Eval_BankAccountNoB_BindingMembers>
+				<Eval_CheckCashFlowId_GetValueFromChild>
+					<DataMember>CheckCashFlowId</DataMember>
+					<Value>IIF(Exists(Child(Ct0),!Empty(CheckCashFlowId)),1,0)</Value>
+				</Eval_CheckCashFlowId_GetValueFromChild>
+				<Eval_BeneficiaryBankId_BindingMember>
+					<ClassName>BravoBindingMember</ClassName>
+					<bindingMembers>
+						<Name>BankNameB</Name>
+						<BankBranchName>BankBranchNameB</BankBranchName>
+						<Province>CityB</Province>
+						<!--26/02/25 KhanhDq: Thêm bankcodeB-->
+						<OtherCode>BankCodeB</OtherCode>
+					</bindingMembers>
+					<LookupKey>Bank</LookupKey>
+					<DataMember>BeneficiaryBankId</DataMember>
+					<SelectKey>IsGroup=0 AND IsActive=1</SelectKey>
+					<Expr>ISNULL(IsEBankingAccount,0)=1 AND !EMPTY(BeneficiaryBankId)</Expr>
+				</Eval_BeneficiaryBankId_BindingMember>
+				<Eval_CheckWorkProcess_SetValue>
+					<DataMember>CheckWorkProcess</DataMember>
+					<Value>IIF(EXISTS(Ct0,!Empty(CheckWorkProcess)),1,0)</Value>
+					<Expr>ISNULL(UsingWorkProcessId,0)=1</Expr>
+				</Eval_CheckWorkProcess_SetValue>
+				<Eval_ConvertFromAR>
+					<ClassName>BravoServerConstraint</ClassName>
+					<DataMember>Ct0</DataMember>
+					<Command>usp_B30BizDoc_ConvertFromBizDocAR</Command>
+					<Parameters>
+						<CurrencyCode>CurrencyCode</CurrencyCode>
+						<ExchangeRate>ExchangeRate</ExchangeRate>
+					</Parameters>
+					<CommandKey>BizDocAR_GetData</CommandKey>
+					<zCtorArgs>FilterKey=CustomerId='{=CustomerId}' AND PostGL=1 AND IsActive=1 AND RemainAmount &gt; 0 AND CurrencyCode='{=CurrencyCode}' AND DocDate&lt;='{=DocDate}';</zCtorArgs>
+					<zSourceValueMember>BizDocId</zSourceValueMember>
+					<zTargetValueMember>BizDocId_AR</zTargetValueMember>
+					<zSourceReturnMember>Id,BizDocId,CustomerId,Description,TotalOriginalAmount0,PaidAmount,RemainAmount,CurrencyCode</zSourceReturnMember>
+					<showMessage>Never</showMessage>
+					<Text />
+					<Expr>!Empty(CustomerId)</Expr>
+				</Eval_ConvertFromAR>
+				<Eval_BizDocPA_GetData>
+					<ClassName>BravoServerConstraint</ClassName>
+					<CommandKey>BizDocPA_GetAdvancePay</CommandKey>
+					<zCtorArgs>FilterKey=DocDate&lt;='{=DocDate}' AND CustomerId='{=CustomerId}' AND CurrencyCode='{=CurrencyCode}' AND PostGL = 1 AND Lock = 0 AND RemainAmount &gt; 0 AND ISNULL(PaymentType, '') = '1';</zCtorArgs>
+					<Command>usp_B30AccDoc_ConvertFromPAAdvance</Command>
+					<Parameters>
+						<ExchangeRate>ExchangeRate</ExchangeRate>
+						<CurrencyCode>CurrencyCode</CurrencyCode>
+					</Parameters>
+					<DataMember>Ct0</DataMember>
+					<zTargetValueMember>_BizDocPA_AR</zTargetValueMember>
+					<zSourceValueMember>_BizDocPA_AR</zSourceValueMember>
+					<zSourceReturnMember>Id,BizDocId,BizDocId_AR,DocDate,CurrencyCode,CustomerId,Description,PayerId,RemainAccountAmount,RemainAmount</zSourceReturnMember>
+					<showMessage>Never</showMessage>
+					<mergingData>Overwrite</mergingData>
+					<Text />
+					<Expr>!Empty(CustomerId)</Expr>
+				</Eval_BizDocPA_GetData>
+				<Eval_BizDocPA_GetDataAtchPurchase>
+					<ClassName>BravoServerConstraint</ClassName>
+					<CommandKey>BizDocDetailPA_AtchPur</CommandKey>
+					<zCtorArgs>FilterKey=DocDate&lt;='{=DocDate}' AND CustomerId='{=CustomerId}' AND CurrencyCode='{=CurrencyCode}' AND PostGL = 1 AND Lock = 0 AND RemainAmount &gt; 0 AND ISNULL(PaymentType, '') = '2';</zCtorArgs>
+					<Command>usp_B30AccDoc_ConvertFromDetailPA_Advance</Command>
+					<Parameters>
+						<ExchangeRate>ExchangeRate</ExchangeRate>
+						<CurrencyCode>CurrencyCode</CurrencyCode>
+						<PaymentType>'2'</PaymentType>
+					</Parameters>
+					<DataMember>Ct0</DataMember>
+					<zTargetValueMember>_BizDocPA_AtchP</zTargetValueMember>
+					<zSourceValueMember>_BizDocPA_AtchP</zSourceValueMember>
+					<zSourceReturnMember>CustomerId,BizDocId,Description,CurrencyCode,OriginalAmount9,PaidAmount,RemainAmount,RowId_AtchPurchase</zSourceReturnMember>
+					<showMessage>Never</showMessage>
+					<mergingData>Overwrite</mergingData>
+					<Text />
+					<Expr>!Empty(CustomerId)</Expr>
+				</Eval_BizDocPA_GetDataAtchPurchase>
+				<Eval_BizDocPA_GetDataPO>
+					<ClassName>BravoServerConstraint</ClassName>
+					<CommandKey>BizDocDetailPA_PO</CommandKey>
+					<zCtorArgs>FilterKey=DocDate&lt;='{=DocDate}' AND CustomerId='{=CustomerId}' AND CurrencyCode='{=CurrencyCode}' AND PostGL = 1 AND Lock = 0 AND RemainAmount &lt;&gt; 0 AND ISNULL(PaymentType, '') = '3';</zCtorArgs>
+					<Command>usp_B30AccDoc_ConvertFromDetailPA_Advance</Command>
+					<Parameters>
+						<ExchangeRate>ExchangeRate</ExchangeRate>
+						<CurrencyCode>CurrencyCode</CurrencyCode>
+						<PaymentType>'3'</PaymentType>
+					</Parameters>
+					<DataMember>Ct0</DataMember>
+					<zTargetValueMember>_BizDocPA_PO</zTargetValueMember>
+					<zSourceValueMember>_BizDocPA_PO</zSourceValueMember>
+					<zSourceReturnMember>CustomerId,BizDocId,Description,CurrencyCode,OriginalAmount9,PaidAmount,RemainAmount,BizDocId_PO</zSourceReturnMember>
+					<showMessage>Never</showMessage>
+					<mergingData>Overwrite</mergingData>
+					<Text />
+					<Expr>!Empty(CustomerId)</Expr>
+				</Eval_BizDocPA_GetDataPO>
+				<Eval_BizDocPA_GetDataLC>
+					<ClassName>BravoServerConstraint</ClassName>
+					<CommandKey>BizDocDetailPA_LC</CommandKey>
+					<zCtorArgs>FilterKey=DocDate&lt;='{=DocDate}' AND CustomerId='{=CustomerId}' AND CurrencyCode='{=CurrencyCode}' AND PostGL = 1 AND Lock = 0 AND RemainAmount &lt;&gt; 0 AND ISNULL(PaymentType, '') = '4';</zCtorArgs>
+					<Command>usp_B30AccDoc_ConvertFromDetailPA_Advance</Command>
+					<Parameters>
+						<ExchangeRate>ExchangeRate</ExchangeRate>
+						<CurrencyCode>CurrencyCode</CurrencyCode>
+						<PaymentType>'4'</PaymentType>
+					</Parameters>
+					<DataMember>Ct0</DataMember>
+					<zTargetValueMember>_BizDocPA_LC</zTargetValueMember>
+					<zSourceValueMember>_BizDocPA_LC</zSourceValueMember>
+					<zSourceReturnMember>CustomerId,BizDocId,Description,CurrencyCode,OriginalAmount9,PaidAmount,RemainAmount,BizDocId_LC</zSourceReturnMember>
+					<showMessage>Never</showMessage>
+					<mergingData>Overwrite</mergingData>
+					<Text />
+					<Expr>!Empty(CustomerId)</Expr>
+				</Eval_BizDocPA_GetDataLC>
+				<Eval_DocInfo_EnableWhen>
+					<DataMember>DocDate,CustomerId,CurrencyCode</DataMember>
+					<Controls>
+						<Enabled>!EXISTS(Ct0, ISNULL(BizDocId_PA, '') &lt;&gt; '') AND !EXISTS(Ct0, ISNULL(BizDocId_AR, '') &lt;&gt; '')</Enabled>
+					</Controls>
+				</Eval_DocInfo_EnableWhen>
+				<Eval_BankPaymentType_GetData>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>ufn_sys_Get_BankPaymentType</Command>
+					<Parameters>
+						<IsEBankingAccount>IsEBankingAccount</IsEBankingAccount>
+						<BankCodeA>BankCodeA</BankCodeA>
+						<BankCodeB>BankCodeB</BankCodeB>
+					</Parameters>
+					<DataMember>BankPaymentType</DataMember>
+					<Text />
+				</Eval_BankPaymentType_GetData>
+				<Eval_PaymentType_ResetValue>
+					<DataMember>PaymentType</DataMember>
+					<Value>NULL</Value>
+				</Eval_PaymentType_ResetValue>
+				<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+				<Eval_UsingIsDraftData_SetValue>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>usp_Approval_CheckUsingIsDraftData</Command>
+					<Parameters>
+						<Id>Id</Id>
+						<DocDate>DocDate</DocDate>
+						<DocCode>DocCode</DocCode>
+						<RowId_DocProcess>RowId_DocProcess</RowId_DocProcess>
+						<BranchCode>BRANCH()</BranchCode>
+						<ApprovalStatus>ApprovalStatus</ApprovalStatus>
+					</Parameters>
+					<DataMember>UsingIsDraftData</DataMember>
+					<Text />
+				</Eval_UsingIsDraftData_SetValue>
+				<Eval_IsDraftData_ResetValue>
+					<DataMember>IsDraftData</DataMember>
+					<Value>0</Value>
+				</Eval_IsDraftData_ResetValue>
+			</Evaluators>
+			<EvaluatorGroups>
+				<EvaluatorGroup_UsingCode_VisibleWhen>
+					<!-- Thăng tập trung việc ẩn / hiện mã vào một Group, chương trình tự thực hiện các eval tác động đến control -->
+					<Eval_TransCode_VisibleWhen>
+						<DataMember>TransCode</DataMember>
+						<Controls>
+							<Name>lblTransCode</Name>
+							<Visible>ISNULL(UsingTransCode,0)=1</Visible>
+						</Controls>
+					</Eval_TransCode_VisibleWhen>
+					<Eval_TransCode0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.TransCode</Name>
+							<Visible>ISNULL(UsingTransCode,0)=2</Visible>
+						</Controls>
+					</Eval_TransCode0_VisibleWhen>
+					<Eval_EmployeeId_VisibleWhen>
+						<DataMember>EmployeeId</DataMember>
+						<Controls>
+							<Name>lblEmployeeId</Name>
+							<Visible>ISNULL(UsingEmployeeId,0)=1</Visible>
+						</Controls>
+					</Eval_EmployeeId_VisibleWhen>
+					<Eval_EmployeeId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.EmployeeId</Name>
+							<Visible>ISNULL(UsingEmployeeId,0)=2</Visible>
+						</Controls>
+					</Eval_EmployeeId0_VisibleWhen>
+					<Eval_DeptId_VisibleWhen>
+						<DataMember>DeptId</DataMember>
+						<Controls>
+							<Name>lblDeptId</Name>
+							<Visible>ISNULL(UsingDeptId,0)=1</Visible>
+						</Controls>
+					</Eval_DeptId_VisibleWhen>
+					<Eval_DeptId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.DeptId</Name>
+							<Visible>ISNULL(UsingDeptId,0)=2</Visible>
+						</Controls>
+					</Eval_DeptId0_VisibleWhen>
+					<Eval_ExpenseCatgId_VisibleWhen>
+						<DataMember>ExpenseCatgId</DataMember>
+						<Controls>
+							<Name>lblExpenseCatgId</Name>
+							<Visible>ISNULL(UsingExpenseCatgId,0)=1</Visible>
+						</Controls>
+					</Eval_ExpenseCatgId_VisibleWhen>
+					<Eval_ExpenseCatgId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.ExpenseCatgId</Name>
+							<Visible>ISNULL(UsingExpenseCatgId,0)=2</Visible>
+						</Controls>
+					</Eval_ExpenseCatgId0_VisibleWhen>
+					<Eval_ProductId_VisibleWhen>
+						<DataMember>ProductId</DataMember>
+						<Controls>
+							<Name>lblProductId</Name>
+							<Visible>ISNULL(UsingProductId,0)=1</Visible>
+						</Controls>
+					</Eval_ProductId_VisibleWhen>
+					<Eval_ProductId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.ProductId</Name>
+							<Visible>ISNULL(UsingProductId,0)=2</Visible>
+						</Controls>
+					</Eval_ProductId0_VisibleWhen>
+					<!--03/11/2020: PhongNVT chuyển cách lấy số liệu từ C1, C2 sang PO, SO
+                    <Eval_BizDocId_C2_VisibleWhen>
+                        <DataMember>BizDocId_C2</DataMember>
+                        <Controls>
+                            <Name>lblBizDocId_C2</Name>
+                            <Visible>ISNULL(UsingBizDocId_C2,0)=1</Visible>
+                        </Controls>
+                    </Eval_BizDocId_C2_VisibleWhen>
+                    <Eval_BizDocId_C20_VisibleWhen>
+                        <Controls>
+                            <Name>BravoGridContainer.Item_Detail.BizDocId_C2</Name>
+                            <Visible>ISNULL(UsingBizDocId_C2,0)=2</Visible>
+                        </Controls>
+                    </Eval_BizDocId_C20_VisibleWhen>
+                    <Eval_BizDocId_C1_VisibleWhen>
+                        <DataMember>BizDocId_C1</DataMember>
+                        <Controls>
+                            <Name>lblBizDocId_C1</Name>
+                            <Visible>ISNULL(UsingBizDocId_C1,0)=1</Visible>
+                        </Controls>
+                    </Eval_BizDocId_C1_VisibleWhen>
+                    <Eval_BizDocId_C10_VisibleWhen>
+                        <Controls>
+                            <Name>BravoGridContainer.Item_Detail.BizDocId_C1</Name>
+                            <Visible>ISNULL(UsingBizDocId_C1,0)=2</Visible>
+                        </Controls>
+                    </Eval_BizDocId_C10_VisibleWhen-->
+					<Eval_BizDocId_PO_VisibleWhen>
+						<DataMember>BizDocId_PO</DataMember>
+						<Controls>
+							<Name>lblBizDocId_PO</Name>
+							<Visible>ISNULL(UsingBizDocId_PO,0)=1</Visible>
+						</Controls>
+					</Eval_BizDocId_PO_VisibleWhen>
+					<Eval_BizDocId_PO0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.BizDocId_PO</Name>
+							<Visible>ISNULL(UsingBizDocId_PO,0)=2</Visible>
+						</Controls>
+					</Eval_BizDocId_PO0_VisibleWhen>
+					<Eval_BizDocId_SO_VisibleWhen>
+						<DataMember>BizDocId_SO</DataMember>
+						<Controls>
+							<Name>lblBizDocId_SO</Name>
+							<Visible>ISNULL(UsingBizDocId_SO,0)=1</Visible>
+						</Controls>
+					</Eval_BizDocId_SO_VisibleWhen>
+					<Eval_BizDocId_SO0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.BizDocId_SO</Name>
+							<Visible>ISNULL(UsingBizDocId_SO,0)=2</Visible>
+						</Controls>
+					</Eval_BizDocId_SO0_VisibleWhen>
+					<Eval_BizDocId_LC_VisibleWhen>
+						<DataMember>BizDocId_LC</DataMember>
+						<Controls>
+							<Name>lblBizDocId_LC</Name>
+							<Visible>ISNULL(UsingBizDocId_LC,0)=1</Visible>
+						</Controls>
+					</Eval_BizDocId_LC_VisibleWhen>
+					<Eval_BizDocId_LC0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.BizDocId_LC</Name>
+							<Visible>ISNULL(UsingBizDocId_LC,0)=2</Visible>
+						</Controls>
+					</Eval_BizDocId_LC0_VisibleWhen>
+					<!--22/05/19: Vũ LA thêm Hợp đồng tiền gửi-->
+					<Eval_BizDocId_DA_VisibleWhen>
+						<DataMember>BizDocId_DA</DataMember>
+						<Controls>
+							<Name>lblBizDocId_DA</Name>
+							<Visible>ISNULL(UsingBizDocId_DA,0)=1</Visible>
+						</Controls>
+					</Eval_BizDocId_DA_VisibleWhen>
+					<Eval_BizDocId_DA0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.BizDocId_DA</Name>
+							<Visible>ISNULL(UsingBizDocId_DA,0)=2</Visible>
+						</Controls>
+					</Eval_BizDocId_DA0_VisibleWhen>
+					<!--12/05/22: ĐứcCM thêm theo dõi phát sinh giảm bảo lãnh, L/C-->
+					<Eval_BizDocId_G2_VisibleWhen>
+						<DataMember>BizDocId_G2</DataMember>
+						<Controls>
+							<Name>lblBizDocId_G2</Name>
+							<Visible>ISNULL(UsingBizDocId_G2,0)=1</Visible>
+						</Controls>
+					</Eval_BizDocId_G2_VisibleWhen>
+					<Eval_BizDocId_G20_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.BizDocId_G2</Name>
+							<Visible>ISNULL(UsingBizDocId_G2,0)=2</Visible>
+						</Controls>
+					</Eval_BizDocId_G20_VisibleWhen>
+					<Eval_BizDocId_G3_VisibleWhen>
+						<DataMember>BizDocId_G3</DataMember>
+						<Controls>
+							<Name>lblBizDocId_G3</Name>
+							<Visible>ISNULL(UsingBizDocId_G3,0)=1</Visible>
+						</Controls>
+					</Eval_BizDocId_G3_VisibleWhen>
+					<Eval_BizDocId_G30_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.BizDocId_G3</Name>
+							<Visible>ISNULL(UsingBizDocId_G3,0)=2</Visible>
+						</Controls>
+					</Eval_BizDocId_G30_VisibleWhen>
+					<Eval_CreditAccount_VisibleWhen>
+						<DataMember>CreditAccount</DataMember>
+						<Controls>
+							<Name>lblCreditAccount</Name>
+							<Visible>ISNULL(UsingAccount,0)=1</Visible>
+						</Controls>
+					</Eval_CreditAccount_VisibleWhen>
+					<Eval_CreditAccount0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.CreditAccount</Name>
+							<Visible>ISNULL(UsingAccount,0)=2</Visible>
+						</Controls>
+					</Eval_CreditAccount0_VisibleWhen>
+					<Eval_WorkProcessId_VisibleWhen>
+						<DataMember>WorkProcessId</DataMember>
+						<Controls>
+							<Name>lblWorkProcessId</Name>
+							<Visible>ISNULL(UsingWorkProcessId,0)=1</Visible>
+						</Controls>
+					</Eval_WorkProcessId_VisibleWhen>
+					<Eval_WorkProcessId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.WorkProcessId</Name>
+							<Visible>ISNULL(UsingWorkProcessId,0)=2</Visible>
+						</Controls>
+					</Eval_WorkProcessId0_VisibleWhen>
+					<Eval_CostCentreId_VisibleWhen>
+						<DataMember>CostCentreId</DataMember>
+						<Controls>
+							<Name>lblCostCentreId</Name>
+							<Visible>ISNULL(UsingCostCentreId,0)=1</Visible>
+						</Controls>
+					</Eval_CostCentreId_VisibleWhen>
+					<Eval_CostCentreId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.CostCentreId</Name>
+							<Visible>ISNULL(UsingCostCentreId,0)=2</Visible>
+						</Controls>
+					</Eval_CostCentreId0_VisibleWhen>
+					<Eval_JobId_VisibleWhen>
+						<DataMember>JobId</DataMember>
+						<Controls>
+							<Name>lblJobId</Name>
+							<Visible>ISNULL(UsingJobId, 0)=1</Visible>
+						</Controls>
+					</Eval_JobId_VisibleWhen>
+					<Eval_JobId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.JobId</Name>
+							<Visible>ISNULL(UsingJobId,0)=2</Visible>
+						</Controls>
+					</Eval_JobId0_VisibleWhen>
+					<Eval_Info_VisibleWhen>
+						<DataMember>BankAddressB,BankCountryB,SwiftCodeB,CountryB,ForwardContractNumber,PaymentType,BankCharge</DataMember>
+						<Controls>
+							<Name>lblBankAddressB,lblBankCountryB,lblSwiftCodeB,lblCountryB,lblForwardContractNumber,lblPaymentType,lblBankCharge</Name>
+							<Visible>ISNULL(UsingRemitInfo,0)=1</Visible>
+						</Controls>
+					</Eval_Info_VisibleWhen>
+					<Eval_CustomFieldId1_VisibleWhen>
+						<DataMember>CustomFieldId1</DataMember>
+						<Controls>
+							<Name>lblCustomFieldId1</Name>
+							<Visible>ISNULL(UsingCustomFieldId1, 0)=1</Visible>
+						</Controls>
+					</Eval_CustomFieldId1_VisibleWhen>
+					<Eval_CustomFieldId10_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.CustomFieldId1</Name>
+							<Visible>ISNULL(UsingCustomFieldId1,0)=2</Visible>
+						</Controls>
+					</Eval_CustomFieldId10_VisibleWhen>
+					<Eval_CustomFieldId2_VisibleWhen>
+						<DataMember>CustomFieldId2</DataMember>
+						<Controls>
+							<Name>lblCustomFieldId2</Name>
+							<Visible>ISNULL(UsingCustomFieldId2, 0)=1</Visible>
+						</Controls>
+					</Eval_CustomFieldId2_VisibleWhen>
+					<Eval_CustomFieldId20_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.CustomFieldId2</Name>
+							<Visible>ISNULL(UsingCustomFieldId2,0)=2</Visible>
+						</Controls>
+					</Eval_CustomFieldId20_VisibleWhen>
+					<Eval_CustomFieldId3_VisibleWhen>
+						<DataMember>CustomFieldId3</DataMember>
+						<Controls>
+							<Name>lblCustomFieldId3</Name>
+							<Visible>ISNULL(UsingCustomFieldId3, 0)=1</Visible>
+						</Controls>
+					</Eval_CustomFieldId3_VisibleWhen>
+					<Eval_CustomFieldId30_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.CustomFieldId3</Name>
+							<Visible>ISNULL(UsingCustomFieldId3,0)=2</Visible>
+						</Controls>
+					</Eval_CustomFieldId30_VisibleWhen>
+					<Eval_CashFlowId_VisibleWhen>
+						<DataMember>CashFlowId</DataMember>
+						<Controls>
+							<Name>lblCashFlowId</Name>
+							<Visible>ISNULL(UsingCashFlowId,0)=1</Visible>
+						</Controls>
+					</Eval_CashFlowId_VisibleWhen>
+					<Eval_CashFlowId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.CashFlowId</Name>
+							<Visible>ISNULL(UsingCashFlowId,0)=2</Visible>
+						</Controls>
+					</Eval_CashFlowId0_VisibleWhen>
+					<!--29/02/2024 PhanNH: Thêm trường đề nghị thanh toán-->
+					<Eval_BizDocId_PA0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.BizDocId_PA</Name>
+							<Visible>ISNULL(UsingBizDocId_PA,0)=2</Visible>
+						</Controls>
+					</Eval_BizDocId_PA0_VisibleWhen>
+					<!--29/02/2024 PhanNH: Thêm trường đề nghị tạm ứng-->
+					<Eval_BizDocId_AR0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.BizDocId_AR</Name>
+							<Visible>ISNULL(UsingBizDocId_AR,0)=2</Visible>
+						</Controls>
+					</Eval_BizDocId_AR0_VisibleWhen>
+					<Eval_RowId_AtchPurchase_VisibleWhen>
+						<DataMember>RowId_AtchPurchase</DataMember>
+						<Controls>
+							<Name>lblRowId_AtchPurchase</Name>
+							<Visible>ISNULL(UsingRowId_AtchPurchase,0)=1</Visible>
+						</Controls>
+					</Eval_RowId_AtchPurchase_VisibleWhen>
+					<Eval_RowId_AtchPurchase0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.RowId_AtchPurchase</Name>
+							<Visible>ISNULL(UsingRowId_AtchPurchase,0)=2</Visible>
+						</Controls>
+					</Eval_RowId_AtchPurchase0_VisibleWhen>
+					<!--29/05/2024 thêm khoản mục dòng tiền tài chính để lên DL báo cáo LCTT, TMBCTC-->
+					<Eval_NoteFactorId_VisibleWhen>
+						<DataMember>NoteFactorId</DataMember>
+						<Controls>
+							<Name>lblNoteFactorId</Name>
+							<Visible>ISNULL(UsingNoteFactorId, 0)=1</Visible>
+						</Controls>
+					</Eval_NoteFactorId_VisibleWhen>
+					<Eval_NoteFactorId0_VisibleWhen>
+						<Controls>
+							<Name>BravoGridContainer.Item_Detail.NoteFactorId</Name>
+							<Visible>ISNULL(UsingNoteFactorId,0)=2</Visible>
+						</Controls>
+					</Eval_NoteFactorId0_VisibleWhen>
+				</EvaluatorGroup_UsingCode_VisibleWhen>
+			</EvaluatorGroups>
+			<DefaultValues>
+				<DocCode>'BN'</DocCode>
+				<CurrencyCode>CONFIG('M_Ma_Tte0')</CurrencyCode>
+				<BranchCode>BRANCH()</BranchCode>
+				<DocDate>GETDATE()</DocDate>
+				<FiscalYear>FISCALYEAR()</FiscalYear>
+				<UserId>USER('Id')</UserId>
+				<CompanyNameA>BRANCH('BranchName')</CompanyNameA>
+				<EBankingStatus>0</EBankingStatus>
+				<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+				<IsDraftData>0</IsDraftData>
+			</DefaultValues>
+			<BeforeTransaction>
+				<Eval_DocProcess_SetValue>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>usp_B20DocProcess_GetData</Command>
+					<DataMember>RowId_DocProcess,DocProcessId</DataMember>
+					<Parameters>
+						<RowId_DocProcess>RowId_DocProcess</RowId_DocProcess>
+						<DocProcessId>DocProcessId</DocProcessId>
+						<DocDate>DocDate</DocDate>
+						<BranchCode>BranchCode</BranchCode>
+						<DocCode>DocCode</DocCode>
+						<LangId>LANGID()</LangId>
+						<Id>Id</Id>
+						<CurrentDataXML>'{=GETXMLDATA('Ct')}'</CurrentDataXML>
+					</Parameters>
+					<Text />
+				</Eval_DocProcess_SetValue>
+				<Eval_Ct0_UpdateBuiltinOrder />
+				<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+				<Eval_AtchDoc_UpdateBuiltinOrder />
+				<Eval_DocNo_DefaultValue>EMPTY(DocNo) AND !EMPTY(AutoNumbering)</Eval_DocNo_DefaultValue>
+				<Eval_Stt_AutoValue>
+					<!-- 16/07/2019 Thăng tạo sẵn Stt trước khi lưu -->
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>usp_sys_CreateSttBySeq</Command>
+					<dataAccessMode>Write</dataAccessMode>
+					<Parameters>
+						<TableName>LayoutTableName()</TableName>
+						<Ws_Id>Branch('Ws_Id')</Ws_Id>
+					</Parameters>
+					<DataMember>Stt</DataMember>
+					<Expr>Empty(Stt)</Expr>
+					<Text />
+				</Eval_Stt_AutoValue>
+				<Eval_Ct0_RowId_AutoValue />
+				<Eval_IsPostWhenSaveNewDoc>
+					<DataMember>IsPostWhenSaveNewDoc</DataMember>
+					<Value>IIF(ROWSTATE()='Added',1,0)</Value>
+				</Eval_IsPostWhenSaveNewDoc>
+				<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+				<Eval_IsDraftData_ResetValue>Empty(RowId_DocProcess)</Eval_IsDraftData_ResetValue>
+				<!--26/08/2024 PhanNH Thêm trạng thái duyệt cho chứng từ-->
+				<Eval_ApprovalStatus_SetValue>
+					<DataMember>ApprovalStatus</DataMember>
+					<Value>IIF(ISNULL(IsDraftData,0)=0,2,1)</Value>
+					<Expr>ISNULL(ApprovalStatus, '') IN ('1','2','') AND !Empty(DocProcessId)</Expr>
+				</Eval_ApprovalStatus_SetValue>
+			</BeforeTransaction>
+			<BeforeCommit>
+				<Default>
+					<CommandType>Procedure</CommandType>
+					<CommandName>usp_B30AccDoc_PostAfterSave</CommandName>
+					<Parameters>
+						<BranchCode>BranchCode</BranchCode>
+						<Stt>Stt</Stt>
+						<DocDate>DocDate</DocDate>
+						<DocCode>DocCode</DocCode>
+						<DocStatus>DocStatus</DocStatus>
+						<RowId_DocProcess>RowId_DocProcess</RowId_DocProcess>
+						<IsPostWhenSaveNewDoc>IsPostWhenSaveNewDoc</IsPostWhenSaveNewDoc>
+						<ConditionViewGL1>IIF(EXISTS(Ct0),1,0)</ConditionViewGL1>
+						<ConditionViewGL2>IIF(EXISTS(Ct0,!Empty(Amount3)) OR EXISTS(AtchDoc,!Empty(Amount)) OR EXISTS(Ct0,!Empty(Amount7)), 1, 0)</ConditionViewGL2>
+						<nUserId>USER('Id')</nUserId>
+						<FiscalYear>FISCALYEAR()</FiscalYear>
+						<LangId>LANGID()</LangId>
+					</Parameters>
+					<Text />
+				</Default>
+			</BeforeCommit>
+			<AfterTransaction>
+				<Eval_AutoPrintVoucher>
+					<ClassName>BravoCommandKey</ClassName>
+					<CommandKey>AccDocViewer_BN AutoRun=True;StartupCommandKey=QuickPrint;PrimaryKeyValue={=Id};</CommandKey>
+					<commandFormState>Minimized</commandFormState>
+					<Expr>ISNULL(AutoPrintVoucher,False)=True</Expr>
+				</Eval_AutoPrintVoucher>
+				<!-- 30/08/2024 PhanNH thêm noti cho duyệt-->
+				<Eval_Approval_PushNotification>
+					<ClassName>BravoServerConstraint</ClassName>
+					<Command>usp_B00NotificationQueue_Approval</Command>
+					<dataAccessMode>Write</dataAccessMode>
+					<Parameters>
+						<ApprovalStatus>2</ApprovalStatus>
+						<Id>Id</Id>
+						<Stt>Stt</Stt>
+						<DocCode>DocCode</DocCode>
+						<DocNo>DocNo</DocNo>
+						<RowId_DocProcess>RowId_DocProcess</RowId_DocProcess>
+						<DocProcessId>DocProcessId</DocProcessId>
+						<LangId>LANGID()</LangId>
+						<nUserId>USER('Id')</nUserId>
+						<BranchCode>BRANCH()</BranchCode>
+					</Parameters>
+					<Expr>!Empty(DocProcessId) AND ISNULL(ApprovalStatus,'')='2'</Expr>
+					<Text />
+				</Eval_Approval_PushNotification>
+			</AfterTransaction>
+			<TempColumns>
+				<IsPostWhenSaveNewDoc>
+					<DataType>System.Int16</DataType>
+				</IsPostWhenSaveNewDoc>
+				<AutoPrintVoucher>
+					<DataType>System.Boolean</DataType>
+				</AutoPrintVoucher>
+				<AttachedTaxInfo>
+					<DataType>System.Byte</DataType>
+				</AttachedTaxInfo>
+				<DocStatusDefault>
+					<DataType>System.Byte</DataType>
+				</DocStatusDefault>
+				<DocumentViewStyleDefault>
+					<DataType>System.Byte</DataType>
+				</DocumentViewStyleDefault>
+				<DebitAccount>
+					<DataType>System.String</DataType>
+				</DebitAccount>
+				<CreditAccount>
+					<DataType>System.String</DataType>
+				</CreditAccount>
+				<BizDocId_LC>
+					<DataType>System.String</DataType>
+				</BizDocId_LC>
+				<!--22/05/19: Vũ LA thêm Hợp đồng tiền gửi-->
+				<BizDocId_DA>
+					<DataType>System.String</DataType>
+				</BizDocId_DA>
+				<!--12/05/22: ĐứcCM thêm theo dõi phát sinh giảm bảo lãnh, L/C-->
+				<BizDocId_G2>
+					<DataType>System.String</DataType>
+				</BizDocId_G2>
+				<BizDocId_G3>
+					<DataType>System.String</DataType>
+				</BizDocId_G3>
+				<Account_Trans>
+					<DataType>System.String</DataType>
+				</Account_Trans>
+				<IsPostGL>
+					<DataType>System.Byte</DataType>
+				</IsPostGL>
+				<CashInBankAccount>
+					<DataType>System.String</DataType>
+				</CashInBankAccount>
+				<BankName>
+					<DataType>System.String</DataType>
+				</BankName>
+				<ExchangeRate_Currency>
+					<DataType>System.Decimal</DataType>
+				</ExchangeRate_Currency>
+				<BankAccount>
+					<DataType>System.Byte</DataType>
+					<DefaultValue>0</DefaultValue>
+				</BankAccount>
+				<CheckProductAccount>
+					<DataType>System.Byte</DataType>
+				</CheckProductAccount>
+				<CheckExpenseCatgId>
+					<DataType>System.Byte</DataType>
+				</CheckExpenseCatgId>
+				<CheckDeptId>
+					<DataType>System.Byte</DataType>
+				</CheckDeptId>
+				<!--03/11/2020: PhongNVT chuyển cách lấy số liệu từ C1, C2 sang PO, SO
+                <CheckBizDocId_C1>
+                    <DataType>System.Byte</DataType>
+                </CheckBizDocId_C1>
+                <CheckBizDocId_C2>
+                    <DataType>System.Byte</DataType>
+                </CheckBizDocId_C2-->
+				<CheckBizDocId_PO>
+					<DataType>System.Byte</DataType>
+				</CheckBizDocId_PO>
+				<CheckBizDocId_SO>
+					<DataType>System.Byte</DataType>
+				</CheckBizDocId_SO>
+				<CheckJobId>
+					<DataType>System.Byte</DataType>
+				</CheckJobId>
+				<TotalAmount_BeforeEdit0>
+					<DataType>System.Decimal</DataType>
+					<DefaultValue>0</DefaultValue>
+				</TotalAmount_BeforeEdit0>
+				<BizProcess_UserIdList>
+					<DataType>System.String</DataType>
+				</BizProcess_UserIdList>
+				<BizProcess_RoleList>
+					<DataType>System.String</DataType>
+				</BizProcess_RoleList>
+				<!--Ngân hàng điện tử-->
+				<IsEBankingAccount>
+					<DataType>System.Int16</DataType>
+					<DefaultValue>0</DefaultValue>
+				</IsEBankingAccount>
+				<BankPaymentType>
+					<DataType>System.String</DataType>
+					<DefaultValue>''</DefaultValue>
+				</BankPaymentType>
+				<BankCodeA>
+					<DataType>System.String</DataType>
+					<DefaultValue>''</DefaultValue>
+				</BankCodeA>
+				<BankCodeB>
+					<DataType>System.String</DataType>
+					<DefaultValue>''</DefaultValue>
+				</BankCodeB>
+				<IsCreated>
+					<DataType>System.Byte</DataType>
+				</IsCreated>
+				<CheckCostCentre>
+					<DataType>System.Byte</DataType>
+				</CheckCostCentre>
+				<!-- 23/10/2023 ANHPK cảnh báo nhập công đoạn theo TK-->
+				<CheckWorkProcess>
+					<DataType>System.Byte</DataType>
+				</CheckWorkProcess>
+				<!-- 03/06/2021 ThắngĐQ: Tk nợ hạch toán ngân hàng trong chi tiết -->
+				<CashInDebitBankAccount>
+					<DataType>System.String</DataType>
+				</CashInDebitBankAccount>
+				<CheckCashFlowId>
+					<DataType>System.Byte</DataType>
+				</CheckCashFlowId>
+				<RowId_AtchPurchase>
+					<DataType>System.String</DataType>
+				</RowId_AtchPurchase>
+				<!--29/07/2024 PhanNH thêm nút tích lưu nháp-->
+				<UsingIsDraftData>
+					<DataType>System.Int16</DataType>
+				</UsingIsDraftData>
+			</TempColumns>
+			<Validators>
+				<FiscalDate>
+					<ClassName>BravoFiscalDateValidator</ClassName>
+					<SourceColumn>DocDate</SourceColumn>
+					<Expr>!(USER('UsingLockDate')=1 AND !EMPTY(USER('LockDate')))</Expr>
+				</FiscalDate>
+				<LockDateByUser>
+					<SourceColumn>DocDate</SourceColumn>
+					<zValidateExpr>DocDate&gt;USER('LockDate') AND (DocDate&gt;=FISCALYEAR('StartDate')) AND (DocDate&lt;=FISCALYEAR('EndDate'))</zValidateExpr>
+					<Expr>USER('UsingLockDate')=1 AND !EMPTY(USER('LockDate'))</Expr>
+					<Text>
+						<Vietnamese>Dữ liệu không phải của năm làm việc hiện thời hoặc đã khóa số liệu.</Vietnamese>
+						<English>Editing data is not current fiscal year or locked.</English>
+						<Chinese>編輯數據不是當前會計年度或已鎖定</Chinese>
+						<Japanese>編集データが現在の会計年度ではないか、ロックされています</Japanese>
+						<Korean>데이터 편집이 현재 회계 연도가 아니거나 잠겨 있습니다.</Korean>
+					</Text>
+				</LockDateByUser>
+				<TransCodeRule>
+					<SourceColumn>TransCode</SourceColumn>
+					<Expr>ISNULL(UsingTransCode,0)=1</Expr>
+				</TransCodeRule>
+				<NotNull>
+					<SourceColumn>CustomerId,Description,CurrencyCode</SourceColumn>
+				</NotNull>
+				<NotNull_DocNo>
+					<SourceColumn>DocNo</SourceColumn>
+					<Expr>EMPTY(AutoNumbering)</Expr>
+				</NotNull_DocNo>
+				<CheckDocNoUnique>
+					<ClassName>BravoServerConstraintValidator</ClassName>
+					<Command>usp_B30AccDoc_CheckUniqueDocNo</Command>
+					<SourceColumn>DocNo,RowId_VoucherRegister</SourceColumn>
+					<TargetColumn>DocNo</TargetColumn>
+					<Parameters>
+						<DocNo>DocNo</DocNo>
+						<DocCode>DocCode</DocCode>
+						<DocCodeNumbering>DocCodeNumbering</DocCodeNumbering>
+						<RowId_VoucherRegister>RowId_VoucherRegister</RowId_VoucherRegister>
+						<BranchCode>BranchCode</BranchCode>
+						<FiscalYear>FiscalYear</FiscalYear>
+					</Parameters>
+					<bValidateWarning>True</bValidateWarning>
+					<bValidateIfModify>True</bValidateIfModify>
+					<bValidateIfNotEmpty>True</bValidateIfNotEmpty>
+					<Text>
+						<Vietnamese>Số chứng từ phải duy nhất.</Vietnamese>
+						<!--09/12/2024 LienNTP sửa text-->
+						<English>The document number must be unique.</English>
+						<Chinese>该文件号必须是唯一的。</Chinese>
+						<Japanese>ドク番号は一意である必要があります。</Japanese>
+						<Korean>선생님 번호 고유해야 합니다.</Korean>
+					</Text>
+				</CheckDocNoUnique>
+				<!--DocNoUnique>
+                    <ClassName>BravoUniqueKeyValidator</ClassName>
+                    <SourceColumn>DocNo</SourceColumn>
+                    <FilterKey>DocCodeNumbering='{=ISNULL(DocCodeNumbering,'')}' AND BranchCode='{=Branch()}' AND FiscalYear='{=FiscalYear}'</FilterKey>
+                    <bValidateWarning>True</bValidateWarning>
+                    <bValidateIfModify>True</bValidateIfModify>
+                    <bValidateIfNotEmpty>True</bValidateIfNotEmpty>
+                </DocNoUnique-->
+				<CreditAccountRule>
+					<SourceColumn>CreditAccount</SourceColumn>
+					<Expr>ISNULL(UsingAccount,0)=1</Expr>
+				</CreditAccountRule>
+				<BankAccountNoARule>
+					<SourceColumn>BankAccountNoA,BankAccount</SourceColumn>
+					<TargetColumn>BankAccountNoA</TargetColumn>
+					<zValidateExpr>!(!Empty(BankAccount) AND Empty(BankAccountNoA))</zValidateExpr>
+				</BankAccountNoARule>
+				<CheckTransCode>
+					<SourceColumn>TransCode</SourceColumn>
+					<Expr>ISNULL(UsingTransCode,0)=1</Expr>
+				</CheckTransCode>
+				<CheckProductId>
+					<SourceColumn>ProductId,CheckProductAccount</SourceColumn>
+					<TargetColumn>ProductId</TargetColumn>
+					<zValidateExpr>!(!Empty(CheckProductAccount) AND Empty(ProductId))</zValidateExpr>
+					<Expr>ISNULL(UsingProductId,0)&lt;&gt;2</Expr>
+				</CheckProductId>
+				<CheckExpenseCatgId>
+					<SourceColumn>ExpenseCatgId,CheckExpenseCatgId</SourceColumn>
+					<TargetColumn>ExpenseCatgId</TargetColumn>
+					<zValidateExpr>!(!Empty(CheckExpenseCatgId) AND Empty(ExpenseCatgId))</zValidateExpr>
+					<Expr>ISNULL(UsingExpenseCatgId,0)=1 AND !Empty(UsingTransCode)</Expr>
+				</CheckExpenseCatgId>
+				<CheckDeptId>
+					<SourceColumn>DeptId,CheckDeptId</SourceColumn>
+					<TargetColumn>DeptId</TargetColumn>
+					<zValidateExpr>!(!Empty(CheckDeptId) AND Empty(DeptId))</zValidateExpr>
+					<Expr>ISNULL(UsingDeptId,0)=1 AND !Empty(UsingTransCode)</Expr>
+				</CheckDeptId>
+				<!--03/11/2020: PhongNVT chuyển cách lấy số liệu từ C1, C2 sang PO, SO
+                <CheckBizDocId_C1>
+                    <SourceColumn>BizDocId_C1,CheckBizDocId_C1</SourceColumn>
+                    <TargetColumn>BizDocId_C1</TargetColumn>
+                    <zValidateExpr>!(!Empty(CheckBizDocId_C1) AND Empty(BizDocId_C1))</zValidateExpr>
+                    <Expr>UsingBizDocId_C1=1 AND !Empty(UsingTransCode)</Expr>
+                </CheckBizDocId_C1>
+                <CheckBizDocId_C2>
+                    <SourceColumn>BizDocId_C2,CheckBizDocId_C2</SourceColumn>
+                    <TargetColumn>BizDocId_C2</TargetColumn>
+                    <zValidateExpr>!(!Empty(CheckBizDocId_C2) AND Empty(BizDocId_C2))</zValidateExpr>
+                    <Expr>UsingBizDocId_C2=1 AND !Empty(UsingTransCode)</Expr>
+                </CheckBizDocId_C2-->
+				<CheckBizDocId_PO>
+					<SourceColumn>BizDocId_PO,CheckBizDocId_PO</SourceColumn>
+					<TargetColumn>BizDocId_PO</TargetColumn>
+					<zValidateExpr>!(!Empty(CheckBizDocId_PO) AND Empty(BizDocId_PO))</zValidateExpr>
+					<Expr>UsingBizDocId_PO=1 AND !Empty(UsingTransCode)</Expr>
+				</CheckBizDocId_PO>
+				<CheckBizDocId_SO>
+					<SourceColumn>BizDocId_SO,CheckBizDocId_SO</SourceColumn>
+					<TargetColumn>BizDocId_SO</TargetColumn>
+					<zValidateExpr>!(!Empty(CheckBizDocId_SO) AND Empty(BizDocId_SO))</zValidateExpr>
+					<Expr>UsingBizDocId_SO=1 AND !Empty(UsingTransCode)</Expr>
+				</CheckBizDocId_SO>
+				<CheckJobId>
+					<SourceColumn>JobId,CheckJobId</SourceColumn>
+					<TargetColumn>JobId</TargetColumn>
+					<zValidateExpr>!(!Empty(CheckJobId) AND Empty(JobId))</zValidateExpr>
+					<Expr>ISNULL(UsingJobId,0)=1 AND !Empty(UsingTransCode)</Expr>
+				</CheckJobId>
+				<CheckBizProcess>
+					<!--Đang trong quá trình duyệt chứng từ thì không được sửa đổi (theo y/c mr BắcTP ngày 1/8/18)-->
+					<ClassName>BravoValidator</ClassName>
+					<SourceColumn>UserId</SourceColumn>
+					<zValidateExpr>({=USER('Id')} = CreatedBy AND (Empty(DocProcessId) OR ISNULL(IsDraftData0,0)=1)) OR CHARINDEX(','+CONVERT({=USER('Id')},'String')+',', BizProcess_UserIdList)&gt;=0</zValidateExpr>
+					<Expr>!EMPTY(RowId_DocProcess) AND Id&gt;0</Expr>
+					<Text>
+						<Vietnamese>Người sử dụng không được sửa dữ liệu trong quá trình duyệt</Vietnamese>
+						<English>User can not modify the document in approval process.</English>
+						<Japanese>承認プロセスで文書を変更することはできません</Japanese>
+						<Chinese>无法在批准过程中修改文档</Chinese>
+						<Korean>승인 프로세스에서 문서를 수정할 수 없습니다.</Korean>
+					</Text>
+					<Caption>
+						<Vietnamese>Người dùng {=USER('Username')}</Vietnamese>
+						<English>User {=USER('Username')}</English>
+						<Chinese>用户 {=USER('Username')}</Chinese>
+						<Japanese>ユーザー {=USER('Username')}</Japanese>
+						<Korean>사용자 {=USER('Username')}</Korean>
+					</Caption>
+				</CheckBizProcess>
+				<CheckDocBookingId>
+					<ClassName>BravoServerConstraintValidator</ClassName>
+					<SourceColumn>DocBookingId,DocDate</SourceColumn>
+					<Command>ufn_B20DocBooking_CheckDate</Command>
+					<Parameters>
+						<DocBookingId>DocBookingId</DocBookingId>
+						<DocDate>DocDate</DocDate>
+					</Parameters>
+					<TargetColumn>DocBookingId</TargetColumn>
+					<Expr>CONFIG('M_AccBookingForm')=1</Expr>
+				</CheckDocBookingId>
+				<CheckCostCentre>
+					<SourceColumn>CostCentreId,CheckCostCentre</SourceColumn>
+					<TargetColumn>CostCentreId</TargetColumn>
+					<zValidateExpr>!(!Empty(CheckCostCentre) AND Empty(CostCentreId))</zValidateExpr>
+					<Expr>UsingCostCentreId=1 AND !Empty(UsingTransCode)</Expr>
+				</CheckCostCentre>
+				<!-- 03/06/2021 ThắngĐQ: Tk nợ có theo dõi ngân hàng hay không -->
+				<CheckBankAccountNoB>
+					<!-- 28/06/2021 ANHPK bắt thêm điều kiện BeneficiaryBankAccId-->
+					<SourceColumn>BankAccountNoB,CashInDebitBankAccount,BeneficiaryBankAccId</SourceColumn>
+					<TargetColumn>BankAccountNoB</TargetColumn>
+					<zValidateExpr>(!Empty(CashInDebitBankAccount) AND !Empty(BankAccountNoB) AND !Empty(BeneficiaryBankAccId)) OR Empty(CashInDebitBankAccount)</zValidateExpr>
+					<Text>
+						<Vietnamese>Phải chọn số TKNH hợp lệ khi hạch toán chuyển tiền giữa các TKNH</Vietnamese>
+						<English>Must choose a valid bank account number when accounting for money transfer between bank accounts</English>
+						<Japanese>銀行口座間のお金の譲渡を勘案する場合は、有効な銀行口座番号を選択する必要があります。</Japanese>
+						<Chinese>必须在银行账户之间汇总汇款时选择有效的银行帐号</Chinese>
+						<Korean>은행 계좌 간의 돈 이송을 차지할 때 유효한 은행 계좌 번호를 선택해야합니다.</Korean>
+					</Text>
+				</CheckBankAccountNoB>
+				<NotNullEBanking>
+					<SourceColumn>BankAccountNoB,BeneficiaryBankId,BankNameB,PaymentType,IsEBankingAccount,BankCharge</SourceColumn>
+					<TargetColumn>BankAccountNoB,BeneficiaryBankId,BankNameB,PaymentType,BankCharge</TargetColumn>
+					<zValidateExpr>(IsEBankingAccount=1 AND !EMPTY(BankAccountNoB) AND !EMPTY(BeneficiaryBankId) AND !EMPTY(BankNameB) AND !EMPTY(PaymentType) AND !EMPTY(BankCharge)) OR EMPTY(IsEBankingAccount)</zValidateExpr>
+				</NotNullEBanking>
+				<CheckCashFlowId>
+					<SourceColumn>CashFlowId,CheckCashFlowId</SourceColumn>
+					<TargetColumn>CashFlowId</TargetColumn>
+					<zValidateExpr>!(!Empty(CheckCashFlowId) AND Empty(CashFlowId))</zValidateExpr>
+					<Expr>ISNULL(UsingCashFlowId,0)=1 AND !Empty(UsingTransCode)</Expr>
+				</CheckCashFlowId>
+				<!-- 23/10/2023 ANHPK cảnh báo nhập công đoạn theo TK-->
+				<CheckWorkProcess>
+					<SourceColumn>WorkProcessId,CheckWorkProcess</SourceColumn>
+					<TargetColumn>WorkProcessId</TargetColumn>
+					<zValidateExpr>!(!EMPTY(CheckWorkProcess) AND EMPTY(WorkProcessId))</zValidateExpr>
+					<Expr>ISNULL(UsingWorkProcessId,0)=1</Expr>
+				</CheckWorkProcess>
+				<CheckWorkProcess2>
+					<ClassName>BravoServerConstraintValidator</ClassName>
+					<Command>usp_sys_WorkProcessValidator</Command>
+					<SourceColumn>WorkProcessId,DebitAccount,CreditAccount</SourceColumn>
+					<TargetColumn>WorkProcessId</TargetColumn>
+					<Parameters>
+						<DebitAccount>DebitAccount</DebitAccount>
+						<CreditAccount>CreditAccount</CreditAccount>
+						<WorkProcessId>WorkProcessId</WorkProcessId>
+						<BranchCode>BRANCH()</BranchCode>
+					</Parameters>
+					<Expr>UsingWorkProcessId=1 AND !EXISTS(Ct0)</Expr>
+					<Text>
+						<Vietnamese>Không được bỏ trắng giá trị</Vietnamese>
+						<English>Do not remove white value</English>
+						<Japanese>白い値を削除しないでください</Japanese>
+						<Chinese>不要删除白色价值</Chinese>
+						<Korean>흰색 값을 제거하지 마십시오</Korean>
+					</Text>
+				</CheckWorkProcess2>
+			</Validators>
+			<ChildCollection>
+				<ChildTable_Detail>
+					<Name>vB30AccDocCashPayment_Edit</Name>
+					<Columns>*, ISNULL(BizDocId_PA, '') + '-' + ISNULL(BizDocId_AR, '') AS _BizDocPA_AR,
+                        ISNULL(BizDocId_PA, '') + '-' + ISNULL(RowId_AtchPurchase, '') AS _BizDocPA_AtchP,
+                        ISNULL(BizDocId_PA, '') + '-' + ISNULL(BizDocId_PO, '') AS _BizDocPA_PO,
+                        ISNULL(BizDocId_PA, '') + '-' + ISNULL(BizDocId_LC, '') AS _BizDocPA_LC</Columns>
+					<Alias>Ct0</Alias>
+					<ParentKey>Stt</ParentKey>
+					<ChildKey>Stt</ChildKey>
+					<RefreshColumnList>Stt</RefreshColumnList>
+					<Sort>BuiltinOrder</Sort>
+					<CopyList>BizDocId_PA,BizDocId_AR,_BizDocPA_AR,_BizDocPA_AtchP,_BizDocPA_PO,_BizDocPA_LC</CopyList>
+					<CopyMode>Exclude</CopyMode>
+					<RowAdded>
+						<Eval_Ct0_DefaultValueFromParent>
+							<ClassName>BravoCopyValue</ClassName>
+							<CopyValues>
+								<BranchCode>Parent.BranchCode</BranchCode>
+								<DocCode>Parent.DocCode</DocCode>
+								<DocDate>Parent.DocDate</DocDate>
+								<DocGroup>Parent.DocGroup</DocGroup>
+								<!-- 19/04/2021 ThắngĐQ: Thêm cột lưu mã Id theo dõi ngân hàng -->
+								<BankAccId>Parent.BankAccId</BankAccId>
+								<Description>IIF(Empty(Description),Parent.Description,Description)</Description>
+								<Description0>IIF(Empty(Description),Parent.Description,Description)</Description0>
+								<CustomerId>IIF(Empty(CustomerId),Parent.CustomerId,CustomerId)</CustomerId>
+								<TransCode>IIF(Empty(TransCode),Parent.TransCode,TransCode)</TransCode>
+							</CopyValues>
+						</Eval_Ct0_DefaultValueFromParent>
+						<Eval_Ct0_DebitAccount_DefaultValue />
+						<Eval_Ct0_CreditAccount_DefaultValue />
+						<Eval_Ct0_RunningAverageExchangeRate />
+						<Eval_Ct0_BookingExchangeRate_AutoValue />
+						<Eval_Ct0_DeptId_DefaultValueFromParent>!Empty(Parent.DeptId)</Eval_Ct0_DeptId_DefaultValueFromParent>
+						<Eval_Ct0_ExpenseCatgId_DefaultValueFromParent>!Empty(Parent.ExpenseCatgId)</Eval_Ct0_ExpenseCatgId_DefaultValueFromParent>
+						<Eval_Ct0_EmployeeId_DefaultValueFromParent>!Empty(Parent.EmployeeId)</Eval_Ct0_EmployeeId_DefaultValueFromParent>
+						<Eval_Ct0_ProductId_DefaultValueFromParent>!Empty(Parent.ProductId)</Eval_Ct0_ProductId_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_LC_DefaultValueFromParent>!Empty(Parent.BizDocId_LC)</Eval_Ct0_BizDocId_LC_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_DA_DefaultValueFromParent>!Empty(Parent.BizDocId_DA)</Eval_Ct0_BizDocId_DA_DefaultValueFromParent>
+						<!--12/05/22: ĐứcCM thêm theo dõi phát sinh giảm bảo lãnh, L/C-->
+						<Eval_Ct0_BizDocId_G2_DefaultValueFromParent>!Empty(Parent.BizDocId_G2)</Eval_Ct0_BizDocId_G2_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_G3_DefaultValueFromParent>!Empty(Parent.BizDocId_G3)</Eval_Ct0_BizDocId_G3_DefaultValueFromParent>
+						<Eval_Ct0_WorkProcessId_DefaultValueFromParent>!Empty(Parent.WorkProcessId)</Eval_Ct0_WorkProcessId_DefaultValueFromParent>
+						<Eval_Ct0_CostCentreId_DefaultValueFromParent>!Empty(Parent.CostCentreId)</Eval_Ct0_CostCentreId_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_PO_DefaultValueFromParent>!Empty(Parent.BizDocId_PO)</Eval_Ct0_BizDocId_PO_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_SO_DefaultValueFromParent>!Empty(Parent.BizDocId_SO)</Eval_Ct0_BizDocId_SO_DefaultValueFromParent>
+						<Eval_Ct0_JobId_DefaultValueFromParent>!Empty(Parent.JobId)</Eval_Ct0_JobId_DefaultValueFromParent>
+						<Eval_Ct0_GetTransInfoFromParent />
+						<Eval_Ct0_CustomFieldId1_DefaultValueFromParent />
+						<Eval_Ct0_CustomFieldId2_DefaultValueFromParent />
+						<Eval_Ct0_CustomFieldId3_DefaultValueFromParent />
+						<Eval_Ct0_CashInDebitBankAccount_DefaultValueFromParent />
+						<Eval_Ct0_CashFlowId_DefaultValueFromParent />
+						<Eval_DocInfo_EnableWhen />
+						<Eval_Ct0_RowId_AtchPurchase_DefaultValueFromParent>!Empty(Parent.RowId_AtchPurchase)</Eval_Ct0_RowId_AtchPurchase_DefaultValueFromParent>
+						<!--29/05/2024 thêm khoản mục dòng tiền tài chính để lên DL báo cáo LCTT, TMBCTC-->
+						<Eval_Ct0_NoteFactorId_DefaultValueFromParent />
+						<Eval_Ct0_CheckWorkProcess_SetValue />
+						<!--27/06/2024 bổ sung các trường liên kết QTTU -->
+						<Eval_Ct0__BizDocPA_AR />
+						<Eval_Ct0__BizDocPA_AtchP />
+						<Eval_Ct0__BizDocPA_PO />
+						<Eval_Ct0__BizDocPA_LC />
+					</RowAdded>
+					<RowCopied>
+						<Eval_Ct0_RunningAverageExchangeRate />
+						<Eval_Ct0_BookingExchangeRate_AutoValue />
+						<Eval_Ct0_Amount9 />
+						<Eval_Ct0_Amount3 />
+						<Eval_Ct0_Amount7 />
+						<Eval_Ct0_Amount8 />
+						<Eval_Ct0_AttachedDocNo_ResetValue>
+							<!-- Xóa ngày, số hóa đơn HTT để lấy theo chứng từ mới nếu không có TaxCode -->
+							<DataMember>AttachedDocDate,AttachedDocNo,EInvoiceLink,EInvoiceKey</DataMember>
+							<Value>NULL</Value>
+							<Expr>Empty(TaxCode) AND !Empty(DueDate)</Expr>
+						</Eval_Ct0_AttachedDocNo_ResetValue>
+					</RowCopied>
+					<TableMerged>
+						<Eval_TotalOriginalAmount0 />
+						<Eval_TotalAmount0 />
+						<Eval_TotalOriginalAmount3 />
+						<Eval_TotalAmount3 />
+						<Eval_GetTransInfoFromChild />
+						<Eval_CheckProductAccount_GetValueFromChild />
+						<!-- 03/06/2021 ThắngĐQ: Tk nợ có theo dõi ngân hàng hay không -->
+						<Eval_CashInDebitBankAccount_GetValue />
+						<Eval_CheckWorkProcess_SetValue />
+						<Eval_DocInfo_EnableWhen />
+						<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+						<Eval_VisibleTaxInfoE3 />
+					</TableMerged>
+					<ColumnChanging>
+						<Account_Trans>
+							<Eval_Ct0_DebitAccount_ResetIfChangeByUser>
+								<DataMember>DebitAccount</DataMember>
+								<Expr>DocGroup&lt;&gt;'1'</Expr>
+								<Value>NULL</Value>
+								<bSuppressChangeEvents>True</bSuppressChangeEvents>
+							</Eval_Ct0_DebitAccount_ResetIfChangeByUser>
+							<Eval_Ct0_CreditAccount_ResetIfChangeByUser>
+								<DataMember>CreditAccount</DataMember>
+								<Expr>DocGroup&lt;&gt;'2'</Expr>
+								<Value>NULL</Value>
+								<bSuppressChangeEvents>True</bSuppressChangeEvents>
+							</Eval_Ct0_CreditAccount_ResetIfChangeByUser>
+						</Account_Trans>
+						<DebitAccount>
+							<Eval_Ct0_DebitAccount3_ClearIfSameAsDebitAccount />
+							<!-- 03/06/2021 ThắngĐQ: Tk nợ có theo dõi ngân hàng hay không -->
+							<Eval_Ct0_BankDebitAccount_ResetValue>
+								<DataMember>BankDebitAccount</DataMember>
+								<Value>NULL</Value>
+								<Expr>!EMPTY(BankDebitAccount)</Expr>
+							</Eval_Ct0_BankDebitAccount_ResetValue>
+						</DebitAccount>
+						<CreditAccount>
+							<Eval_Ct0_CreditAccount3_ClearIfSameAsCreditAccount />
+						</CreditAccount>
+						<TaxCode>
+							<Eval_AttachedTaxInfo_ResetValue />
+						</TaxCode>
+						<Account_VAT>
+							<Eval_Ct0_DebitAccount3_ClearIfSameAsAccount_VAT>
+								<DataMember>DebitAccount3</DataMember>
+								<Expr>TaxType=1 AND ISNULL(DebitAccount3,'')=ISNULL(Account_VAT,'')</Expr>
+								<Value>NULL</Value>
+								<bSuppressChangeEvents>True</bSuppressChangeEvents>
+							</Eval_Ct0_DebitAccount3_ClearIfSameAsAccount_VAT>
+							<Eval_Ct0_CreditAccount3_ClearIfSameAsAccount_VAT>
+								<DataMember>CreditAccount3</DataMember>
+								<Expr>TaxType=2 AND ISNULL(CreditAccount3,'')=ISNULL(Account_VAT,'')</Expr>
+								<Value>NULL</Value>
+								<bSuppressChangeEvents>True</bSuppressChangeEvents>
+							</Eval_Ct0_CreditAccount3_ClearIfSameAsAccount_VAT>
+						</Account_VAT>
+						<CustomerId>
+							<Eval_Ct0_TaxRegNo_ClearIfSameTaxRegNo_Customer />
+						</CustomerId>
+						<CustomerName>
+							<Eval_Ct0_TaxRegName_ClearIfSameCustomerName />
+						</CustomerName>
+						<TaxType>
+							<Eval_Ct0_Account3_Reset>
+								<DataMember>DebitAccount3,CreditAccount3</DataMember>
+								<Value>NULL</Value>
+								<bSuppressChangeEvents>True</bSuppressChangeEvents>
+							</Eval_Ct0_Account3_Reset>
+						</TaxType>
+					</ColumnChanging>
+					<ColumnChanged>
+						<DocDate>
+							<Eval_Ct0_DocDate_DefaultValueFromParent />
+							<Eval_Ct0_RunningAverageExchangeRate />
+						</DocDate>
+						<TransCode>
+							<Eval_Ct0_Account_Trans_DefaultValueFromParent>
+								<DataMember>Account_Trans</DataMember>
+								<Expr>Account_Trans IS NULL AND !Empty(TransCode) AND !Empty(Parent.TransCode) AND TransCode=Parent.TransCode</Expr>
+								<Value>Parent.Account_Trans</Value>
+							</Eval_Ct0_Account_Trans_DefaultValueFromParent>
+							<Eval_Ct0_IsPostGL_DefaultValueFromParent>
+								<DataMember>IsPostGL</DataMember>
+								<Expr>IsPostGL IS NULL AND !Empty(TransCode) AND !Empty(Parent.TransCode) AND TransCode=Parent.TransCode</Expr>
+								<Value>Parent.IsPostGL</Value>
+							</Eval_Ct0_IsPostGL_DefaultValueFromParent>
+						</TransCode>
+						<Account_Trans>
+							<Eval_Ct0_DebitAccount_DefaultValue />
+							<Eval_Ct0_CreditAccount_DefaultValue />
+						</Account_Trans>
+						<DebitAccount>
+							<Eval_Ct0_DebitAccount3_DefaultValue />
+							<Eval_Ct0_DebitAccount7_AutoValue />
+							<Eval_Ct0_ExchangeRate_LC_GetValue />
+							<!-- 23/10/2023 ANHPK cảnh báo nhập công đoạn theo TK-->
+							<Eval_Ct0_CheckWorkProcess_SetValue />
+						</DebitAccount>
+						<CreditAccount>
+							<Eval_CashInBankAccount_DefaultValue />
+							<Eval_Ct0_RunningAverageExchangeRate />
+							<Eval_Ct0_ExchangeRate_LC_GetValue />
+							<Eval_Ct0_CreditAccount3_DefaultValue />
+							<Eval_Ct0_CreditAccount7_AutoValue />
+						</CreditAccount>
+						<CustomerId>
+							<Eval_Ct0_CustomerId_DefaultValueFromParent />
+						</CustomerId>
+						<Description0>
+							<Eval_Ct0_Description0_DefaultValueFromParent>UpdatedColumn()='Description0' AND Empty(Description0)</Eval_Ct0_Description0_DefaultValueFromParent>
+							<Eval_Ct0_Description_AutoValue />
+						</Description0>
+						<!-- 19/04/2021 ThắngĐQ: Thêm cột lưu mã Id theo dõi ngân hàng -->
+						<BankAccId>
+							<Eval_Ct0_RunningAverageExchangeRate />
+						</BankAccId>
+						<RunningAverageExchangeRate>
+							<Eval_Ct0_BookingExchangeRate_AutoValue />
+						</RunningAverageExchangeRate>
+						<ForeignCurrCreditAccount>
+							<Eval_Ct0_BookingExchangeRate_AutoValue />
+						</ForeignCurrCreditAccount>
+						<BookingExchangeRate>
+							<Eval_Ct0_Amount9 />
+							<Eval_Ct0_Amount7 />
+							<Eval_Ct0_Amount3 />
+							<Eval_Ct0_Amount8 />
+							<Eval_Ct0_DebitAccount7_AutoValue />
+							<Eval_Ct0_CreditAccount7_AutoValue />
+							<Eval_Ct0_DebitAccount8_AutoValue />
+							<Eval_Ct0_CreditAccount8_AutoValue />
+						</BookingExchangeRate>
+						<PriceIncludeTax>
+							<Eval_Ct0_OriginalAmount3 />
+							<Eval_Ct0_OriginalAmount />
+							<Eval_Ct0_Amount />
+						</PriceIncludeTax>
+						<OriginalAmount9>
+							<Eval_Ct0_Amount9 />
+							<Eval_Ct0_OriginalAmount3 />
+							<Eval_Ct0_OriginalAmount />
+							<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+							<Eval_Ct0_OriginalUnitCost />
+						</OriginalAmount9>
+						<Amount9>
+							<Eval_Ct0_Amount9 />
+							<Eval_Ct0_Amount />
+						</Amount9>
+						<OriginalAmount>
+							<Eval_Ct0_Amount7 />
+							<Eval_TotalOriginalAmount0 />
+						</OriginalAmount>
+						<Amount>
+							<Eval_TotalAmount0 />
+						</Amount>
+						<TaxCode>
+							<Eval_AttachedTaxInfo />
+							<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+							<Eval_Ct0_AtchDocVATInfo_ResetValue />
+						</TaxCode>
+						<TaxRate>
+							<Eval_Ct0_OriginalAmount3 />
+						</TaxRate>
+						<TaxType>
+							<Eval_Ct0_OriginalAmount3 />
+							<Eval_Ct0_Amount3 />
+							<Eval_Ct0_DebitAccount3_DefaultValue />
+							<Eval_Ct0_CreditAccount3_DefaultValue />
+							<Eval_Ct0_TaxRegNo_DefaultValue />
+							<Eval_Ct0_TaxRegName_DefaultValue />
+							<Eval_ClearIfNoVAT>
+								<!-- 02/06/2023 Bổ sung Quantity, Unit (TT80) -->
+								<DataMember>AttachedDocDate,AttachedDocSerialNo,AttachedDocFormNo,AttachedDocNo,AttachedDescription,Quantity,EInvoiceLink,EInvoiceKey,Unit</DataMember>
+								<Expr>TaxType IS NULL</Expr>
+								<Value>NULL</Value>
+							</Eval_ClearIfNoVAT>
+						</TaxType>
+						<Account_VAT>
+							<Eval_Ct0_DebitAccount3_DefaultValue />
+							<Eval_Ct0_CreditAccount3_DefaultValue />
+						</Account_VAT>
+						<OriginalAmount3>
+							<Eval_Ct0_OriginalAmount3 />
+							<Eval_Ct0_Amount3 />
+							<Eval_Ct0_Amount8 />
+							<Eval_Ct0_OriginalAmount>PriceIncludeTax=1</Eval_Ct0_OriginalAmount>
+							<Eval_TotalOriginalAmount3 />
+						</OriginalAmount3>
+						<Amount3>
+							<Eval_Ct0_Amount3 />
+							<Eval_Ct0_Amount />
+							<Eval_TotalAmount3 />
+						</Amount3>
+						<DebitAccount3>
+							<Eval_Ct0_DebitAccount3_DefaultValue />
+							<Eval_Ct0_DebitAccount8_AutoValue />
+						</DebitAccount3>
+						<CreditAccount3>
+							<Eval_Ct0_CreditAccount3_DefaultValue />
+							<Eval_Ct0_CreditAccount8_AutoValue />
+						</CreditAccount3>
+						<Amount7>
+							<Eval_Ct0_DebitAccount7_AutoValue />
+							<Eval_Ct0_CreditAccount7_AutoValue />
+							<Eval_TotalAmount0 />
+						</Amount7>
+						<CreditAccount7>
+							<Eval_TotalAmount0 />
+						</CreditAccount7>
+						<Amount8>
+							<Eval_Ct0_DebitAccount8_AutoValue />
+							<Eval_Ct0_CreditAccount8_AutoValue />
+							<Eval_TotalAmount3 />
+						</Amount8>
+						<CreditAccount8>
+							<Eval_TotalAmount3 />
+						</CreditAccount8>
+						<CustomerName>
+							<Eval_Ct0_TaxRegName_DefaultValue />
+						</CustomerName>
+						<TaxRegNo_Customer>
+							<Eval_Ct0_TaxRegNo_DefaultValue />
+						</TaxRegNo_Customer>
+						<TaxRegNo>
+							<Eval_Ct0_TaxRegNo_DefaultValue />
+							<Eval_Ct0_TaxRegNo_ActiveStatus>
+								<!-- 27/12/2024 dùng API lấy thông tin từ MST -->
+								<ClassName>BravoDataServiceEvaluator</ClassName>
+								<DataMember>TaxRegNo</DataMember>
+								<bindingMembers>
+									<Status>TaxRegNoStatus</Status>
+									<CompanyName>TaxRegName</CompanyName>
+								</bindingMembers>
+							</Eval_Ct0_TaxRegNo_ActiveStatus>
+						</TaxRegNo>
+						<TaxRegName>
+							<Eval_Ct0_TaxRegName_DefaultValue />
+						</TaxRegName>
+						<DueDate>
+							<Eval_Ct0_DateDue_AutoValue />
+						</DueDate>
+						<DateDue>
+							<Eval_Ct0_DueDate_AutoValue />
+						</DateDue>
+						<BizDocId_LC>
+							<Eval_ExchangeRate_LC_VisibleWhen>
+								<Name>BravoGridContainer.Item_Detail.ExchangeRate_LC</Name>
+								<Controls>
+									<DataMember>ExchangeRate_LC</DataMember>
+									<Visible>!Empty(BizDocId_LC)</Visible>
+								</Controls>
+							</Eval_ExchangeRate_LC_VisibleWhen>
+							<Eval_ExchangeRate_LC_Reset>
+								<DataMember>ExchangeRate_LC</DataMember>
+								<Value>NULL</Value>
+								<Expr>Empty(BizDocId_LC)</Expr>
+							</Eval_ExchangeRate_LC_Reset>
+							<Eval_Ct0_ExchangeRate_LC_GetValue />
+							<Eval_Ct0__BizDocPA_LC />
+						</BizDocId_LC>
+						<ExchangeRate_LC>
+							<!-- 12/02/19: Thăng gọi thêm tính CLTG khế ước -->
+							<Eval_Ct0_Amount9 />
+							<Eval_Ct0_Amount3 />
+							<Eval_Ct0_Amount7 />
+							<Eval_Ct0_Amount8 />
+						</ExchangeRate_LC>
+						<DocGroup>
+							<Eval_Ct0_DocGroup_DefaultFromParent />
+						</DocGroup>
+						<CurrencyCode>
+							<Eval_Ct0_CurrencyCode_DefaultValueFromParent />
+							<Eval_Ct0_ExchangeRate_LC_GetValue />
+						</CurrencyCode>
+						<ProductDebitAccount>
+							<Eval_CheckProductAccount_GetValueFromChild>Parent.UsingProductId=1</Eval_CheckProductAccount_GetValueFromChild>
+						</ProductDebitAccount>
+						<ProductCreditAccount>
+							<Eval_CheckProductAccount_GetValueFromChild>Parent.UsingProductId=1</Eval_CheckProductAccount_GetValueFromChild>
+						</ProductCreditAccount>
+						<CheckExpenseCatgId>
+							<Eval_CheckExpenseCatgId_GetValueFromChild>Parent.UsingExpenseCatgId=1 AND Parent.UsingTransCode=2</Eval_CheckExpenseCatgId_GetValueFromChild>
+						</CheckExpenseCatgId>
+						<CheckDeptId>
+							<Eval_CheckDeptId_GetValueFromChild>Parent.UsingDeptId=1 AND Parent.UsingTransCode=2</Eval_CheckDeptId_GetValueFromChild>
+						</CheckDeptId>
+						<CheckJobId>
+							<Eval_CheckJobId_GetValueFromChild>Parent.UsingJobId=1 AND Parent.UsingTransCode=2</Eval_CheckJobId_GetValueFromChild>
+						</CheckJobId>
+						<CheckBizDocId_PO>
+							<Eval_CheckBizDocId_PO_GetValueFromChild>Parent.UsingBizDocId_PO=1 AND Parent.UsingTransCode=2</Eval_CheckBizDocId_PO_GetValueFromChild>
+						</CheckBizDocId_PO>
+						<CheckBizDocId_SO>
+							<Eval_CheckBizDocId_SO_GetValueFromChild>Parent.UsingBizDocId_SO=1 AND Parent.UsingTransCode=2</Eval_CheckBizDocId_SO_GetValueFromChild>
+						</CheckBizDocId_SO>
+						<CheckCostCentre>
+							<Eval_CheckCostCentre_GetValueFromChild>Parent.UsingCostCentreId =1 AND Parent.UsingTransCode=2</Eval_CheckCostCentre_GetValueFromChild>
+						</CheckCostCentre>
+						<!-- 03/06/2021 ThắngĐQ: Tk nợ có theo dõi ngân hàng hay không -->
+						<BankDebitAccount>
+							<Eval_CashInDebitBankAccount_GetValue />
+						</BankDebitAccount>
+						<CheckCashFlowId>
+							<Eval_CheckCashFlowId_GetValueFromChild>Parent.UsingCashFlowId=1 AND Parent.UsingTransCode=2</Eval_CheckCashFlowId_GetValueFromChild>
+						</CheckCashFlowId>
+						<EInvoiceLink>
+							<Eval_Ct0_ButtEInvoiceLink_DefaultValue>
+								<DataMember>ButtEInvoiceLink</DataMember>
+								<Value>EInvoiceLink</Value>
+							</Eval_Ct0_ButtEInvoiceLink_DefaultValue>
+						</EInvoiceLink>
+						<WorkProcessId>
+							<!-- 23/10/2023 ANHPK cảnh báo nhập công đoạn theo TK-->
+							<Eval_Ct0_CheckWorkProcess_SetValue />
+						</WorkProcessId>
+						<!-- 23/10/2023 ANHPK cảnh báo nhập công đoạn theo TK-->
+						<CheckWorkProcess>
+							<Eval_CheckWorkProcess_SetValue />
+						</CheckWorkProcess>
+						<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+						<Quantity>
+							<Eval_Ct0_OriginalUnitCost />
+						</Quantity>
+						<OriginalUnitCost>
+							<Eval_Ct0_OriginalUnitCost_SetValue>UPDATEDCOLUMN()='OriginalUnitCost'</Eval_Ct0_OriginalUnitCost_SetValue>
+							<Eval_Ct0_UnitCost />
+						</OriginalUnitCost>
+						<AtchDocOrder>
+							<Eval_Ct0_AtchDocOrder_SetValue>
+								<DataMember>AtchDocOrder</DataMember>
+								<Value>ABS(AtchDocOrder)</Value>
+								<bSuppressChangeEvents>True</bSuppressChangeEvents>
+								<Expr>!EMPTY(AtchDocOrder)</Expr>
+							</Eval_Ct0_AtchDocOrder_SetValue>
+						</AtchDocOrder>
+						<!--27/06/2024 bổ sung các trường liên kết QTTU -->
+						<BizDocId_PO>
+							<Eval_Ct0__BizDocPA_PO />
+						</BizDocId_PO>
+						<RowId_AtchPurchase>
+							<Eval_Ct0__BizDocPA_AtchP />
+						</RowId_AtchPurchase>
+						<BizDocId_AR>
+							<Eval_Ct0__BizDocPA_AR />
+						</BizDocId_AR>
+						<BizDocId_PA>
+							<Eval_Ct0__BizDocPA_LC />
+							<Eval_Ct0__BizDocPA_AR />
+							<Eval_Ct0__BizDocPA_AtchP />
+							<Eval_Ct0__BizDocPA_PO />
+						</BizDocId_PA>
+						<TaxRegNoStatus>
+							<!-- 27/12/2024 dùng API lấy thông tin từ MST -->
+							<Eval_TaxRegNo_StatusColor>
+								<DataMember>TaxRegNo,TaxRegName</DataMember>
+								<Controls>
+									<!-- https://ketoananpha.vn/cac-trang-thai-ma-so-thue-doanh-nghiep.html -->
+									<Style>IIF(!Empty(TaxRegNo) AND !Empty(TaxRegNoStatus) AND TaxRegNoStatus&lt;&gt;'00','ForeColor:Red;','ForeColor:Black;')</Style>
+								</Controls>
+							</Eval_TaxRegNo_StatusColor>
+						</TaxRegNoStatus>
+					</ColumnChanged>
+					<Expressions>
+						<CurrencyCode>Parent.CurrencyCode</CurrencyCode>
+						<TaxType_Ct>Parent.TaxType_Ct</TaxType_Ct>
+						<ExchangeRateOperator>Parent.ExchangeRateOperator</ExchangeRateOperator>
+						<DecimalRound>Parent.DecimalRound</DecimalRound>
+						<ExchangeRate>IIF(Parent.CurrencyCode=CONFIG('M_Ma_Tte0'),
+                                        IIF(ISNULL(ExchangeRate_LC,0)=0, Parent.ExchangeRate, ExchangeRate_LC), Parent.ExchangeRate)</ExchangeRate>
+						<OriginalDueAmount>ISNULL(OriginalAmount,0)+ISNULL(OriginalAmount3,0)</OriginalDueAmount>
+						<DueAmount>ISNULL(Amount,0)+ISNULL(Amount3,0)</DueAmount>
+						<Account>IIF(DocGroup='2' AND CustomerDebitAccount=1,DebitAccount,IIF(DocGroup='1' AND CustomerCreditAccount=1,CreditAccount,NULL))</Account>
+					</Expressions>
+					<TempColumns>
+						<ExchangeRate_LC>
+							<DataType>System.Decimal</DataType>
+						</ExchangeRate_LC>
+						<BankAccId>
+							<DataType>System.String</DataType>
+						</BankAccId>
+						<BankDebitAccount>
+							<DataType>System.Byte</DataType>
+						</BankDebitAccount>
+						<BeneficiaryBankAccId>
+							<DataType>System.Int32</DataType>
+						</BeneficiaryBankAccId>
+						<CashInDebitBankAccount>
+							<DataType>System.String</DataType>
+						</CashInDebitBankAccount>
+						<ButtEInvoiceLink>
+							<DataType>System.String</DataType>
+							<DefaultValue>''</DefaultValue>
+						</ButtEInvoiceLink>
+						<!-- 23/10/2023 ANHPK cảnh báo nhập công đoạn theo TK-->
+						<CheckWorkProcess>
+							<DataType>System.Byte</DataType>
+						</CheckWorkProcess>
+						<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+						<ItemName>
+							<DataType>System.String</DataType>
+						</ItemName>
+						<UnitCost>
+							<DataType>System.Decimal</DataType>
+						</UnitCost>
+						<OriginalUnitCost>
+							<DataType>System.Decimal</DataType>
+						</OriginalUnitCost>
+						<AtchDocOrder>
+							<DataType>System.Int16</DataType>
+						</AtchDocOrder>
+						<TaxRegNoStatus>
+							<!-- 27/12/2024 dùng API lấy thông tin từ MST -->
+							<DataType>System.String</DataType>
+						</TaxRegNoStatus>
+					</TempColumns>
+					<Evaluators>
+						<Eval_Ct0_UpdateBuiltinOrder>
+							<ClassName>BravoTableOrderer</ClassName>
+							<DataMember>BuiltinOrder</DataMember>
+						</Eval_Ct0_UpdateBuiltinOrder>
+						<Eval_Ct0_ExchangeRate_LC_GetValue>
+							<ClassName>BravoServerConstraint</ClassName>
+							<DataMember>ExchangeRate_LC</DataMember>
+							<!--02/12/2022 ThắngĐQ: Chuyển sang thủ tục tương thích SQL Azure-->
+							<Command>usp_B30BizDoc_LC_ExchangeRate</Command>
+							<Parameters>
+								<BranchCode>Parent.BranchCode</BranchCode>
+								<Stt>Parent.Stt</Stt>
+								<DocDate>Parent.DocDate</DocDate>
+								<DebitAccount>DebitAccount</DebitAccount>
+								<CurrencyCode>Parent.CurrencyCode</CurrencyCode>
+								<BizDocId_LC>BizDocId_LC</BizDocId_LC>
+							</Parameters>
+							<Expr>!Empty(BizDocId_LC)</Expr>
+							<Text />
+						</Eval_Ct0_ExchangeRate_LC_GetValue>
+						<Eval_Ct0_DebitAccount_DefaultValue>
+							<DataMember>DebitAccount</DataMember>
+							<Expr>Empty(DebitAccount)</Expr>
+							<Value>IIF(DocGroup='2' AND !Empty(Account_Trans),Account_Trans,Parent.DebitAccount)</Value>
+						</Eval_Ct0_DebitAccount_DefaultValue>
+						<Eval_Ct0_CreditAccount_DefaultValue>
+							<DataMember>CreditAccount</DataMember>
+							<Expr>Empty(CreditAccount) OR ISNULL(Parent.UsingAccount,0)=1</Expr>
+							<Value>IIF(DocGroup='1' AND !Empty(Account_Trans),Account_Trans,Parent.CreditAccount)</Value>
+						</Eval_Ct0_CreditAccount_DefaultValue>
+						<!-- 19/04/2021 ThắngĐQ: Thêm cột lưu mã Id theo dõi ngân hàng -->
+						<Eval_Ct0_BankAccId_DefaultValueFromParent>
+							<DataMember>BankAccId</DataMember>
+							<Value>Parent.BankAccId</Value>
+						</Eval_Ct0_BankAccId_DefaultValueFromParent>
+						<!-- 11/06/2021: Anhpk lên thêm số dư theo BankAccId cho TK là loại TK ngân hàng-->
+						<Eval_Ct0_BeneficiaryBankAccId_DefaultValueFromParent>
+							<DataMember>BeneficiaryBankAccId</DataMember>
+							<Value>Parent.BeneficiaryBankAccId</Value>
+						</Eval_Ct0_BeneficiaryBankAccId_DefaultValueFromParent>
+						<Eval_Ct0_DocDate_DefaultValueFromParent>
+							<DataMember>DocDate</DataMember>
+							<Value>Parent.DocDate</Value>
+						</Eval_Ct0_DocDate_DefaultValueFromParent>
+						<Eval_Ct0_RunningAverageExchangeRate>
+							<ClassName>BravoServerConstraint</ClassName>
+							<Command>usp_B30OpenBalance_RunningAverageExchangeRate</Command>
+							<DataMember>RunningAverageExchangeRate,SeqNo</DataMember>
+							<Expr>DocGroup='2' AND !Empty(CreditAccount)</Expr>
+							<Parameters>
+								<BranchCode>BranchCode</BranchCode>
+								<Stt>Stt</Stt>
+								<DocDate>Parent.DocDate</DocDate>
+								<DocNo>Parent.DocNo</DocNo>
+								<Account>CreditAccount</Account>
+								<!-- 19/04/2021 ThắngĐQ: Thêm cột lưu mã Id theo dõi ngân hàng -->
+								<BankAccId>Parent.BankAccId</BankAccId>
+								<CurrencyCode>Parent.CurrencyCode</CurrencyCode>
+								<RunningAverageExchangeRate>RunningAverageExchangeRate</RunningAverageExchangeRate>
+								<SeqNo>SeqNo</SeqNo>
+							</Parameters>
+							<Text />
+						</Eval_Ct0_RunningAverageExchangeRate>
+						<Eval_Ct0_BookingExchangeRate_AutoValue>
+							<DataMember>BookingExchangeRate</DataMember>
+							<Value>IIF(!Empty(Parent.ExchangeRate) AND DocGroup='2' AND ForeignCurrCreditAccount=1 AND CurrencyCode&lt;&gt;CONFIG('M_Ma_Tte0') AND !Empty(RunningAverageExchangeRate),RunningAverageExchangeRate,Parent.ExchangeRate)</Value>
+						</Eval_Ct0_BookingExchangeRate_AutoValue>
+						<Eval_Ct0_CreditAccount_ClearIfSameAsParent>
+							<DataMember>CreditAccount</DataMember>
+							<!-- 15/10/18 Thăng fix lỗi đổi Tk dòng chi tiết thì các dòng Tk giống nhau bị đổi theo -->
+							<Expr>ISNULL(Parent.CreditAccount,'')=ISNULL(CreditAccount,'') AND Parent.UsingAccount=1</Expr>
+							<Value>NULL</Value>
+						</Eval_Ct0_CreditAccount_ClearIfSameAsParent>
+						<Eval_Ct0_CreditAccount3_ClearIfSameAsParent>
+							<DataMember>CreditAccount3</DataMember>
+							<Expr>ISNULL(Parent.CreditAccount,'')=ISNULL(CreditAccount3,'')</Expr>
+							<Value>NULL</Value>
+						</Eval_Ct0_CreditAccount3_ClearIfSameAsParent>
+						<Eval_Ct0_CustomerId_ClearIfSameAsParent>
+							<DataMember>CustomerId</DataMember>
+							<Expr>ISNULL(Parent.CustomerId,0)=ISNULL(CustomerId,0)</Expr>
+							<Value>NULL</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_CustomerId_ClearIfSameAsParent>
+						<Eval_Ct0_CustomerId_DefaultValueFromParent>
+							<DataMember>CustomerId</DataMember>
+							<Expr>Empty(CustomerId)</Expr>
+							<Value>Parent.CustomerId</Value>
+						</Eval_Ct0_CustomerId_DefaultValueFromParent>
+						<Eval_Ct0_TaxRegNo_ClearIfSameAsParent>
+							<DataMember>TaxRegNo</DataMember>
+							<Expr>ISNULL(Parent.CustomerId,0)=ISNULL(CustomerId,0) AND ISNULL(TaxRegNo,'')=ISNULL(Parent.TaxRegNo_Customer,'')</Expr>
+							<Value>NULL</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_TaxRegNo_ClearIfSameAsParent>
+						<Eval_Ct0_TaxRegName_ClearIfSameAsParent>
+							<DataMember>TaxRegName</DataMember>
+							<Expr>ISNULL(Parent.CustomerId,0)=ISNULL(CustomerId,0) AND ISNULL(TaxRegName,'')=ISNULL(Parent.CustomerName,'')</Expr>
+							<Value>NULL</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_TaxRegName_ClearIfSameAsParent>
+						<Eval_Ct0_Description0_ClearIfSameAsParent>
+							<DataMember>Description0</DataMember>
+							<Expr>ISNULL(Parent.Description,'')=ISNULL(Description0,'') AND ISNULL(Description0,'')&lt;&gt;''</Expr>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+							<Value>NULL</Value>
+						</Eval_Ct0_Description0_ClearIfSameAsParent>
+						<Eval_Ct0_Description0_DefaultValueFromParent>
+							<DataMember>Description0</DataMember>
+							<Expr>Empty(Description0) AND !Empty(Parent.Description)</Expr>
+							<Value>Parent.Description</Value>
+						</Eval_Ct0_Description0_DefaultValueFromParent>
+						<Eval_Ct0_Description_AutoValue>
+							<DataMember>Description</DataMember>
+							<Value>IIF(ISNULL(Description0,'')=Parent.Description,NULL,Description0)</Value>
+						</Eval_Ct0_Description_AutoValue>
+						<Eval_Ct0_DeptId_DefaultValueFromParent>
+							<DataMember>DeptId</DataMember>
+							<Expr>Empty(DeptId) OR ISNULL(Parent.UsingDeptId,0)=1</Expr>
+							<Value>Parent.DeptId</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_DeptId_DefaultValueFromParent>
+						<Eval_Ct0_ExpenseCatgId_DefaultValueFromParent>
+							<DataMember>ExpenseCatgId</DataMember>
+							<Expr>Empty(ExpenseCatgId) OR ISNULL(Parent.UsingExpenseCatgId,0)=1</Expr>
+							<Value>Parent.ExpenseCatgId</Value>
+						</Eval_Ct0_ExpenseCatgId_DefaultValueFromParent>
+						<Eval_Ct0_EmployeeId_DefaultValueFromParent>
+							<DataMember>EmployeeId</DataMember>
+							<Expr>Empty(EmployeeId) OR ISNULL(Parent.UsingEmployeeId,0)=1</Expr>
+							<Value>Parent.EmployeeId</Value>
+						</Eval_Ct0_EmployeeId_DefaultValueFromParent>
+						<Eval_Ct0_ProductId_DefaultValueFromParent>
+							<DataMember>ProductId</DataMember>
+							<Expr>Empty(ProductId) OR ISNULL(Parent.UsingProductId,0)=1</Expr>
+							<Value>Parent.ProductId</Value>
+						</Eval_Ct0_ProductId_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_LC_DefaultValueFromParent>
+							<DataMember>BizDocId_LC</DataMember>
+							<Expr>Empty(BizDocId_LC) OR ISNULL(Parent.UsingBizDocId_LC,0)=1</Expr>
+							<Value>Parent.BizDocId_LC</Value>
+						</Eval_Ct0_BizDocId_LC_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_DA_DefaultValueFromParent>
+							<DataMember>BizDocId_DA</DataMember>
+							<Expr>Empty(BizDocId_DA) OR ISNULL(Parent.UsingBizDocId_DA,0)=1</Expr>
+							<Value>Parent.BizDocId_DA</Value>
+						</Eval_Ct0_BizDocId_DA_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_G2_DefaultValueFromParent>
+							<DataMember>BizDocId_G2</DataMember>
+							<Expr>Empty(BizDocId_G2) OR ISNULL(Parent.UsingBizDocId_G2,0)=1</Expr>
+							<Value>Parent.BizDocId_G2</Value>
+						</Eval_Ct0_BizDocId_G2_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_G3_DefaultValueFromParent>
+							<DataMember>BizDocId_G3</DataMember>
+							<Expr>Empty(BizDocId_G3) OR ISNULL(Parent.UsingBizDocId_G3,0)=1</Expr>
+							<Value>Parent.BizDocId_G3</Value>
+						</Eval_Ct0_BizDocId_G3_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_PO_DefaultValueFromParent>
+							<DataMember>BizDocId_PO</DataMember>
+							<Expr>Empty(BizDocId_PO) OR ISNULL(Parent.UsingBizDocId_PO,0)=1</Expr>
+							<Value>Parent.BizDocId_PO</Value>
+						</Eval_Ct0_BizDocId_PO_DefaultValueFromParent>
+						<Eval_Ct0_BizDocId_SO_DefaultValueFromParent>
+							<DataMember>BizDocId_SO</DataMember>
+							<Expr>Empty(BizDocId_SO) OR ISNULL(Parent.UsingBizDocId_SO,0)=1</Expr>
+							<Value>Parent.BizDocId_SO</Value>
+						</Eval_Ct0_BizDocId_SO_DefaultValueFromParent>
+						<Eval_Ct0_JobId_DefaultValueFromParent>
+							<DataMember>JobId</DataMember>
+							<Expr>ISNULL(Parent.UsingJobId,0)=1 OR Empty(JobId)</Expr>
+							<Value>Parent.JobId</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_JobId_DefaultValueFromParent>
+						<Eval_Ct0_CurrencyCode_DefaultValueFromParent>
+							<DataMember>CurrencyCode</DataMember>
+							<Value>Parent.CurrencyCode</Value>
+						</Eval_Ct0_CurrencyCode_DefaultValueFromParent>
+						<Eval_Ct0_TransCode_DefaultValueFromParent>
+							<DataMember>TransCode</DataMember>
+							<Expr>Empty(TransCode) OR ISNULL(Parent.UsingTransCode,0)=1</Expr>
+							<Value>Parent.TransCode</Value>
+						</Eval_Ct0_TransCode_DefaultValueFromParent>
+						<Eval_Ct0_Account_Trans_GetValueFromParent>
+							<DataMember>Account_Trans</DataMember>
+							<Value>Parent.Account_Trans</Value>
+						</Eval_Ct0_Account_Trans_GetValueFromParent>
+						<Eval_Ct0_CheckExpenseCatgId_GetValueFromParent>
+							<DataMember>CheckExpenseCatgId</DataMember>
+							<Value>Parent.CheckExpenseCatgId</Value>
+						</Eval_Ct0_CheckExpenseCatgId_GetValueFromParent>
+						<Eval_Ct0_CheckDeptId_GetValueFromParent>
+							<DataMember>CheckDeptId</DataMember>
+							<Value>Parent.CheckDeptId</Value>
+						</Eval_Ct0_CheckDeptId_GetValueFromParent>
+						<Eval_Ct0_CheckJobId_GetValueFromParent>
+							<DataMember>CheckJobId</DataMember>
+							<Value>Parent.CheckJobId</Value>
+						</Eval_Ct0_CheckJobId_GetValueFromParent>
+						<Eval_Ct0_CheckBizDocId_PO_GetValueFromParent>
+							<DataMember>CheckBizDocId_PO</DataMember>
+							<Value>Parent.CheckBizDocId_PO</Value>
+						</Eval_Ct0_CheckBizDocId_PO_GetValueFromParent>
+						<Eval_Ct0_CheckBizDocId_SO_GetValueFromParent>
+							<DataMember>CheckBizDocId_SO</DataMember>
+							<Value>Parent.CheckBizDocId_SO</Value>
+						</Eval_Ct0_CheckBizDocId_SO_GetValueFromParent>
+						<Eval_Ct0_Amount9>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>Amount9</DataMember>
+							<zFormula>IIF(ExchangeRateOperator=0,{0}/{1},{0}*{1})</zFormula>
+							<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+							<zMoneyValue>OriginalAmount9</zMoneyValue>
+							<zNumberValue>IIF((BookingExchangeRate&lt;ExchangeRate AND ExchangeRateOperator=1) OR 
+                        (BookingExchangeRate&gt;ExchangeRate AND ExchangeRateOperator=0),
+                        BookingExchangeRate,
+                        ExchangeRate)</zNumberValue>
+							<zResultMarginValue>IIF(UpdatedColumn()='Amount9',Parent.MoneyDiffValue0,0)</zResultMarginValue>
+						</Eval_Ct0_Amount9>
+						<Eval_Ct0_OriginalAmount>
+							<DataMember>OriginalAmount</DataMember>
+							<zResultDecimalRound>DecimalRound</zResultDecimalRound>
+							<Value>IIF(ISNULL(PriceIncludeTax,0)=1,OriginalAmount9-ISNULL(OriginalAmount3,0),OriginalAmount9)</Value>
+						</Eval_Ct0_OriginalAmount>
+						<Eval_Ct0_Amount>
+							<DataMember>Amount</DataMember>
+							<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+							<Value>IIF(ISNULL(PriceIncludeTax,0)=1,Amount9-ISNULL(Amount3,0),Amount9)</Value>
+						</Eval_Ct0_Amount>
+						<Eval_Ct0_Amount7>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>Amount7</DataMember>
+							<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+							<zMoneyValue>OriginalAmount</zMoneyValue>
+							<zNumberValue>IIF(ExchangeRate&gt;BookingExchangeRate,
+                                                        (IIF(ExchangeRateOperator=0,1/BookingExchangeRate-1/ExchangeRate,ExchangeRate-BookingExchangeRate)),
+                                                        (IIF(ExchangeRateOperator=0,1/ExchangeRate-1/BookingExchangeRate,BookingExchangeRate-ExchangeRate)))</zNumberValue>
+						</Eval_Ct0_Amount7>
+						<Eval_Ct0_DebitAccount7_AutoValue>
+							<DataMember>DebitAccount7</DataMember>
+							<Value>IIF(Empty(Amount7),NULL,
+            IIF((BookingExchangeRate&gt;ExchangeRate AND ExchangeRateOperator=1) OR (BookingExchangeRate&lt;ExchangeRate AND ExchangeRateOperator=0),
+            IIF(DocGroup='2',CONFIG('M_Tk_CLTG_Chi'),DebitAccount),IIF(DocGroup='2',DebitAccount,CONFIG('M_Tk_CLTG_Chi'))))</Value>
+						</Eval_Ct0_DebitAccount7_AutoValue>
+						<Eval_Ct0_CreditAccount7_AutoValue>
+							<DataMember>CreditAccount7</DataMember>
+							<Value>IIF(Empty(Amount7),NULL,IIF((BookingExchangeRate&gt;ExchangeRate AND ExchangeRateOperator=1) OR (BookingExchangeRate&lt;ExchangeRate AND ExchangeRateOperator=0),IIF(DocGroup='2',CreditAccount,CONFIG('M_Tk_CLTG_Thu')),IIF(DocGroup='2',CONFIG('M_Tk_CLTG_Thu'),CreditAccount)))</Value>
+						</Eval_Ct0_CreditAccount7_AutoValue>
+						<Eval_Ct0_IsTaxIncluded_ResetIfChangeByUser>
+							<DataMember>IsTaxIncluded</DataMember>
+							<Value>0</Value>
+						</Eval_Ct0_IsTaxIncluded_ResetIfChangeByUser>
+						<Eval_Ct0_IsTaxIncluded_AutoValue>
+							<DataMember>IsTaxIncluded</DataMember>
+							<Value>ISNULL(PriceIncludeTax,0)=1 AND ISNULL(OriginalAmount,0)&lt;&gt;ISNULL(OriginalAmount9,0)</Value>
+						</Eval_Ct0_IsTaxIncluded_AutoValue>
+						<Eval_Ct0_OriginalAmount3>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>OriginalAmount3</DataMember>
+							<Expr>(TaxType IS NULL OR !Empty(TaxRate))</Expr>
+							<zNumberValue>IIF(ISNULL(PriceIncludeTax,0)=1,TaxRate/(1+TaxRate),TaxRate)</zNumberValue>
+							<zMoneyValue>OriginalAmount9</zMoneyValue>
+							<zResultDecimalRound>DecimalRound</zResultDecimalRound>
+							<zResultMarginValue>IIF(UpdatedColumn()='OriginalAmount3',Parent.VATDiffValue, 0)</zResultMarginValue>
+							<allowRunning>Nonnested</allowRunning>
+						</Eval_Ct0_OriginalAmount3>
+						<Eval_Ct0_Amount3>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>Amount3</DataMember>
+							<zFormula>IIF(ExchangeRateOperator=0,{0}/{1},{0}*{1})</zFormula>
+							<zResultMarginValue>IIF(UpdatedColumn()='Amount3',Parent.VATDiffValue0,0)</zResultMarginValue>
+							<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+							<zMoneyValue>OriginalAmount3</zMoneyValue>
+							<zNumberValue>IIF((ExchangeRateOperator=1 AND BookingExchangeRate&lt;ExchangeRate) OR (ExchangeRateOperator=0 AND BookingExchangeRate&gt;ExchangeRate),BookingExchangeRate,ExchangeRate)</zNumberValue>
+						</Eval_Ct0_Amount3>
+						<Eval_Ct0_DebitAccount3_ClearIfSameAsDebitAccount>
+							<DataMember>DebitAccount3</DataMember>
+							<Expr>TaxType=2 AND ISNULL(DebitAccount,'')=ISNULL(DebitAccount3,'')</Expr>
+							<Value>NULL</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_DebitAccount3_ClearIfSameAsDebitAccount>
+						<Eval_Ct0_DebitAccount3_DefaultValue>
+							<DataMember>DebitAccount3</DataMember>
+							<Expr>(TaxType IS NULL OR Empty(DebitAccount3))</Expr>
+							<Value>IIF(TaxType=1,Account_VAT,IIF(TaxType=2,DebitAccount,NULL))</Value>
+						</Eval_Ct0_DebitAccount3_DefaultValue>
+						<Eval_Ct0_CreditAccount3_ClearIfSameAsCreditAccount>
+							<DataMember>CreditAccount3</DataMember>
+							<Expr>TaxType=1 AND ISNULL(CreditAccount,'')=ISNULL(CreditAccount3,'')</Expr>
+							<Value>NULL</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_CreditAccount3_ClearIfSameAsCreditAccount>
+						<Eval_Ct0_CreditAccount3_DefaultValue>
+							<DataMember>CreditAccount3</DataMember>
+							<Expr>(TaxType IS NULL OR Empty(CreditAccount3))</Expr>
+							<Value>IIF(TaxType=1,CreditAccount,IIF(TaxType=2,Account_VAT,NULL))</Value>
+						</Eval_Ct0_CreditAccount3_DefaultValue>
+						<Eval_Ct0_TaxRegNo_DefaultValue>
+							<DataMember>TaxRegNo</DataMember>
+							<Expr>(TaxType IS NULL OR Empty(TaxRegNo))</Expr>
+							<Value>IIF(TaxType IS NULL,NULL,TaxRegNo_Customer)</Value>
+						</Eval_Ct0_TaxRegNo_DefaultValue>
+						<Eval_Ct0_TaxRegNo_ClearIfSameTaxRegNo_Customer>
+							<DataMember>TaxRegNo</DataMember>
+							<Expr>ISNULL(TaxRegNo,'')=ISNULL(TaxRegNo_Customer,'')</Expr>
+							<Value>NULL</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_TaxRegNo_ClearIfSameTaxRegNo_Customer>
+						<Eval_Ct0_TaxRegName_ClearIfSameCustomerName>
+							<DataMember>TaxRegName</DataMember>
+							<Expr>ISNULL(TaxRegName,'')=ISNULL(CustomerName,'')</Expr>
+							<Value>NULL</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_TaxRegName_ClearIfSameCustomerName>
+						<Eval_Ct0_TaxRegName_DefaultValue>
+							<DataMember>TaxRegName</DataMember>
+							<Expr>(TaxType IS NULL OR Empty(TaxRegName))</Expr>
+							<Value>IIF(TaxType IS NULL,NULL,CustomerName)</Value>
+						</Eval_Ct0_TaxRegName_DefaultValue>
+						<Eval_Ct0_DateDue_AutoValue>
+							<DataMember>DateDue</DataMember>
+							<Value>DATEADD(day, DueDate, DocDate)</Value>
+							<Expr>!Empty(DueDate)</Expr>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_DateDue_AutoValue>
+						<Eval_Ct0_DueDate_AutoValue>
+							<DataMember>DueDate</DataMember>
+							<Value>DateDiff(day, DocDate, DateDue)</Value>
+							<Expr>!Empty(DateDue)</Expr>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_DueDate_AutoValue>
+						<Eval_Ct0_Amount8>
+							<DataMember>Amount8</DataMember>
+							<Value>OriginalAmount3*IIF(ExchangeRate&gt;BookingExchangeRate,
+            IIF(ExchangeRateOperator=0,1/BookingExchangeRate-1/ExchangeRate,ExchangeRate-BookingExchangeRate),
+            IIF(ExchangeRateOperator=0,1/ExchangeRate-1/BookingExchangeRate,BookingExchangeRate-ExchangeRate))</Value>
+							<zResultDecimalRound>{=Currency('DecimalRound')}</zResultDecimalRound>
+						</Eval_Ct0_Amount8>
+						<Eval_Ct0_DebitAccount8_AutoValue>
+							<DataMember>DebitAccount8</DataMember>
+							<Value>IIF(Empty(Amount8),NULL,
+              IIF((BookingExchangeRate&gt;ExchangeRate AND ExchangeRateOperator=1) OR (BookingExchangeRate&lt;ExchangeRate AND ExchangeRateOperator=0),
+                IIF(DocGroup='2',CONFIG('M_Tk_CLTG_Chi'),DebitAccount3),IIF(DocGroup='2',DebitAccount3,CONFIG('M_Tk_CLTG_Chi'))))</Value>
+						</Eval_Ct0_DebitAccount8_AutoValue>
+						<Eval_Ct0_CreditAccount8_AutoValue>
+							<DataMember>CreditAccount8</DataMember>
+							<Value>IIF(Empty(Amount8),NULL,
+              IIF((BookingExchangeRate&gt;ExchangeRate AND ExchangeRateOperator=1) OR (BookingExchangeRate&lt;ExchangeRate AND ExchangeRateOperator=0),
+                IIF(DocGroup='2',CreditAccount3,CONFIG('M_Tk_CLTG_Thu')),IIF(DocGroup='2',CONFIG('M_Tk_CLTG_Thu'),CreditAccount3)))</Value>
+						</Eval_Ct0_CreditAccount8_AutoValue>
+						<Eval_Ct0_DocGroup_DefaultFromParent>
+							<DataMember>DocGroup</DataMember>
+							<Value>Parent.DocGroup</Value>
+						</Eval_Ct0_DocGroup_DefaultFromParent>
+						<Eval_Ct0_OriginalAmount9_IfChangeDecimalRound>
+							<DataMember>OriginalAmount9</DataMember>
+							<Value>OriginalAmount9</Value>
+							<zResultDecimalRound>DecimalRound</zResultDecimalRound>
+						</Eval_Ct0_OriginalAmount9_IfChangeDecimalRound>
+						<Eval_Ct0_OriginalAmount_IfChangeDecimalRound>
+							<DataMember>OriginalAmount</DataMember>
+							<Value>OriginalAmount</Value>
+							<zResultDecimalRound>DecimalRound</zResultDecimalRound>
+						</Eval_Ct0_OriginalAmount_IfChangeDecimalRound>
+						<Eval_Ct0_OriginalAmount3_IfChangeDecimalRound>
+							<DataMember>OriginalAmount3</DataMember>
+							<Value>OriginalAmount3</Value>
+							<zResultDecimalRound>DecimalRound</zResultDecimalRound>
+						</Eval_Ct0_OriginalAmount3_IfChangeDecimalRound>
+						<Eval_Ct0_RunningAverageExchangeRate_ResetIfChangeByUser>
+							<DataMember>RunningAverageExchangeRate</DataMember>
+							<Expr>ISNULL(Parent.UsingAccount,0)=1</Expr>
+							<Value>NULL</Value>
+						</Eval_Ct0_RunningAverageExchangeRate_ResetIfChangeByUser>
+						<Eval_Ct0_WorkProcessId_DefaultValueFromParent>
+							<DataMember>WorkProcessId</DataMember>
+							<Expr>Empty(WorkProcessId) OR ISNULL(Parent.UsingWorkProcessId,0)=1</Expr>
+							<Value>Parent.WorkProcessId</Value>
+						</Eval_Ct0_WorkProcessId_DefaultValueFromParent>
+						<Eval_Ct0_CostCentreId_DefaultValueFromParent>
+							<DataMember>CostCentreId</DataMember>
+							<Expr>Empty(CostCentreId) OR ISNULL(Parent.UsingCostCentreId,0)=1</Expr>
+							<Value>Parent.CostCentreId</Value>
+						</Eval_Ct0_CostCentreId_DefaultValueFromParent>
+						<Eval_Ct0_GetDataFromChild>
+							<ClassName>BravoCopyValue</ClassName>
+							<CopyValues>
+								<BankAccId>Parent.BankAccId</BankAccId>
+							</CopyValues>
+						</Eval_Ct0_GetDataFromChild>
+						<Eval_Ct0_TaxCode_BindingMember>
+							<ClassName>BravoBindingMember</ClassName>
+							<DataMember>TaxCode</DataMember>
+							<LookupKey>Tax</LookupKey>
+							<bindingMembers>
+								<Rate>TaxRate</Rate>
+								<PriceIncludeTax>PriceIncludeTax</PriceIncludeTax>
+								<Type>TaxType</Type>
+								<Account>Account_VAT</Account>
+							</bindingMembers>
+							<Expr>!Empty(TaxCode)</Expr>
+						</Eval_Ct0_TaxCode_BindingMember>
+						<Eval_Ct0_TransCode_BindingMember>
+							<ClassName>BravoBindingMember</ClassName>
+							<DataMember>TransCode</DataMember>
+							<LookupKey>Trans</LookupKey>
+							<bindingMembers>
+								<CheckExpenseCatgId>CheckExpenseCatgId</CheckExpenseCatgId>
+								<CheckDeptId>CheckDeptId</CheckDeptId>
+								<!--03/11/2020: PhongNVT chuyển cách lấy số liệu từ C1, C2 sang PO, SO
+                        <CheckBizDocId_C1>CheckBizDocId_C1</CheckBizDocId_C1>
+                        <CheckBizDocId_C2>CheckBizDocId_C2</CheckBizDocId_C2-->
+								<CheckBizDocId_PO>CheckBizDocId_PO</CheckBizDocId_PO>
+								<CheckBizDocId_SO>CheckBizDocId_SO</CheckBizDocId_SO>
+								<CheckJobId>CheckJobId</CheckJobId>
+								<Account>Account_Trans</Account>
+								<IsPostGL>IsPostGL</IsPostGL>
+								<CheckCostCentre>CheckCostCentre</CheckCostCentre>
+								<CheckCashFlowId>CheckCashFlowId</CheckCashFlowId>
+							</bindingMembers>
+							<FilterKey>{=BranchFilter('BranchCode')}</FilterKey>
+							<Expr>!Empty(TransCode)</Expr>
+						</Eval_Ct0_TransCode_BindingMember>
+						<Eval_Ct0_CustomerId_BindingMember>
+							<ClassName>BravoBindingMember</ClassName>
+							<DataMember>CustomerId</DataMember>
+							<LookupKey>Customer</LookupKey>
+							<bindingMembers>
+								<Name>CustomerName</Name>
+								<TaxRegNo>TaxRegNo_Customer</TaxRegNo>
+							</bindingMembers>
+							<Expr>!Empty(CustomerId)</Expr>
+						</Eval_Ct0_CustomerId_BindingMember>
+						<Eval_Ct0_DebitAccount_BindingMember>
+							<!-- 17/03/2025 Chamvt Sửa eval binding  BankDebitAccount-->
+							<ClassName>BravoBindingMember</ClassName>
+							<DataMember>DebitAccount</DataMember>
+							<LookupKey>ChartOfAccount</LookupKey>
+							<bindingMembers>
+								<!-- 03/06/2021 ThắngĐQ: Tk nợ có theo dõi ngân hàng hay không -->
+								<BankAccount>BankDebitAccount</BankAccount>
+							</bindingMembers>
+							<!--DueSideAccount>DueSideDebitAccount</DueSideAccount-->
+							<Expr>!Empty(DebitAccount)</Expr>
+						</Eval_Ct0_DebitAccount_BindingMember>
+						<Eval_Ct0_CreditAccount_BindingMember>
+							<ClassName>BravoBindingMember</ClassName>
+							<DataMember>CreditAccount</DataMember>
+							<LookupKey>ChartOfAccount</LookupKey>
+							<bindingMembers>
+								<CustomerAccount>CustomerCreditAccount</CustomerAccount>
+								<ForeignCurrAccount>ForeignCurrCreditAccount</ForeignCurrAccount>
+								<ProductAccount>ProductCreditAccount</ProductAccount>
+								<DueSideAccount>DueSideCreditAccount</DueSideAccount>
+							</bindingMembers>
+							<Expr>!Empty(CreditAccount)</Expr>
+						</Eval_Ct0_CreditAccount_BindingMember>
+						<Eval_Ct0_GetTransInfoFromParent>
+							<ClassName>BravoCopyValue</ClassName>
+							<Expr>Parent.UsingTransCode=1</Expr>
+							<CopyValues>
+								<CheckExpenseCatgId>Parent.CheckExpenseCatgId</CheckExpenseCatgId>
+								<CheckDeptId>Parent.CheckDeptId</CheckDeptId>
+								<CheckJobId>Parent.CheckJobId</CheckJobId>
+								<CheckBizDocId_PO>Parent.CheckBizDocId_PO</CheckBizDocId_PO>
+								<CheckBizDocId_SO>Parent.CheckBizDocId_SO</CheckBizDocId_SO>
+								<!--03/11/2020: PhongNVT chuyển cách lấy số liệu từ C1, C2 sang PO, SO
+                        <CheckBizDocId_C1>Parent.CheckBizDocId_C1</CheckBizDocId_C1>
+                        <CheckBizDocId_C2>Parent.CheckBizDocId_C2</CheckBizDocId_C2-->
+								<Account_Trans>Parent.Account_Trans</Account_Trans>
+								<IsPostGL>Parent.IsPostGL</IsPostGL>
+								<CheckCostCentre>Parent.CheckCostCentre</CheckCostCentre>
+							</CopyValues>
+						</Eval_Ct0_GetTransInfoFromParent>
+						<Eval_Ct0_RowId_AutoValue>
+							<!-- 16/07/2019 Thăng tạo sẵn RowId trước khi lưu -->
+							<ClassName>BravoServerConstraint</ClassName>
+							<Command>usp_sys_CreateSttBySeq</Command>
+							<dataAccessMode>Write</dataAccessMode>
+							<Parameters>
+								<TableName>LayoutTableName()</TableName>
+								<Ws_Id>Branch('Ws_Id')</Ws_Id>
+								<Ext>Parent.DocCode</Ext>
+							</Parameters>
+							<DataMember>RowId</DataMember>
+							<Expr>Empty(RowId)</Expr>
+							<Text />
+						</Eval_Ct0_RowId_AutoValue>
+						<Eval_Ct0_CustomFieldId1_DefaultValueFromParent>
+							<DataMember>CustomFieldId1</DataMember>
+							<Expr>ISNULL(Parent.UsingCustomFieldId1,0)=1 OR Empty(CustomFieldId1)</Expr>
+							<Value>Parent.CustomFieldId1</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_CustomFieldId1_DefaultValueFromParent>
+						<Eval_Ct0_CustomFieldId2_DefaultValueFromParent>
+							<DataMember>CustomFieldId2</DataMember>
+							<Expr>ISNULL(Parent.UsingCustomFieldId2,0)=1 OR Empty(CustomFieldId2)</Expr>
+							<Value>Parent.CustomFieldId2</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_CustomFieldId2_DefaultValueFromParent>
+						<Eval_Ct0_CustomFieldId3_DefaultValueFromParent>
+							<DataMember>CustomFieldId3</DataMember>
+							<Expr>ISNULL(Parent.UsingCustomFieldId3,0)=1 OR Empty(CustomFieldId3)</Expr>
+							<Value>Parent.CustomFieldId3</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_CustomFieldId3_DefaultValueFromParent>
+						<Eval_Ct0_CheckCostCentre_GetValueFromParent>
+							<DataMember>CheckCostCentre</DataMember>
+							<Value>Parent.CheckCostCentre</Value>
+						</Eval_Ct0_CheckCostCentre_GetValueFromParent>
+						<!-- 28/06/2021 ANHPK bắt thêm điều kiện BeneficiaryBankAccId-->
+						<Eval_Ct0_CashInDebitBankAccount_DefaultValueFromParent>
+							<DataMember>CashInDebitBankAccount</DataMember>
+							<Expr>!EMPTY(Parent.CashInDebitBankAccount)</Expr>
+							<Value>Parent.CashInDebitBankAccount</Value>
+						</Eval_Ct0_CashInDebitBankAccount_DefaultValueFromParent>
+						<Eval_Ct0_CashFlowId_DefaultValueFromParent>
+							<DataMember>CashFlowId</DataMember>
+							<Expr>Empty(CashFlowId) OR ISNULL(Parent.UsingCashFlowId,0)=1</Expr>
+							<Value>Parent.CashFlowId</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_CashFlowId_DefaultValueFromParent>
+						<Eval_Ct0_CheckCashFlowId_GetValueFromParent>
+							<DataMember>CheckCashFlowId</DataMember>
+							<Value>Parent.CheckCashFlowId</Value>
+						</Eval_Ct0_CheckCashFlowId_GetValueFromParent>
+						<Eval_Ct0_CheckWorkProcess_SetValue>
+							<ClassName>BravoServerConstraint</ClassName>
+							<DataMember>CheckWorkProcess</DataMember>
+							<Command>usp_sys_WorkProcessValidator</Command>
+							<Parameters>
+								<DebitAccount>DebitAccount</DebitAccount>
+								<WorkProcessId>WorkProcessId</WorkProcessId>
+								<BranchCode>BRANCH()</BranchCode>
+							</Parameters>
+							<Text />
+						</Eval_Ct0_CheckWorkProcess_SetValue>
+						<Eval_Ct0_RowId_AtchPurchase_DefaultValueFromParent>
+							<DataMember>RowId_AtchPurchase</DataMember>
+							<Expr>Empty(RowId_AtchPurchase) OR ISNULL(Parent.UsingRowId_AtchPurchase,0)=1</Expr>
+							<Value>Parent.RowId_AtchPurchase</Value>
+						</Eval_Ct0_RowId_AtchPurchase_DefaultValueFromParent>
+						<!--29/05/2024 thêm khoản mục dòng tiền tài chính để lên DL báo cáo LCTT, TMBCTC-->
+						<Eval_Ct0_NoteFactorId_DefaultValueFromParent>
+							<DataMember>NoteFactorId</DataMember>
+							<Expr>Empty(NoteFactorId) OR ISNULL(Parent.UsingNoteFactorId,0)=1</Expr>
+							<Value>Parent.NoteFactorId</Value>
+							<bSuppressChangeEvents>True</bSuppressChangeEvents>
+						</Eval_Ct0_NoteFactorId_DefaultValueFromParent>
+						<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+						<Eval_Ct0_OriginalUnitCost>
+							<DataMember>OriginalUnitCost</DataMember>
+							<Value>IIF(EMPTY(Quantity),0,OriginalAmount9/Quantity)</Value>
+							<Expr>!Empty(OriginalAmount9)</Expr>
+						</Eval_Ct0_OriginalUnitCost>
+						<Eval_Ct0_OriginalUnitCost_SetValue>
+							<DataMember>OriginalUnitCost</DataMember>
+							<Value>IIF(ABS(OriginalUnitCost*Quantity-OriginalAmount9)&gt;Parent.MoneyDiffValue0,IIF(EMPTY(Quantity),0,OriginalAmount9/Quantity),OriginalUnitCost)</Value>
+							<Expr>!EMPTY(Quantity) AND !Empty(OriginalAmount9)</Expr>
+						</Eval_Ct0_OriginalUnitCost_SetValue>
+						<Eval_Ct0_UnitCost>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>UnitCost</DataMember>
+							<zResultDecimalRound>5</zResultDecimalRound>
+							<zMoneyValue>OriginalUnitCost</zMoneyValue>
+							<zNumberValue>IIF(Parent.ExchangeRateOperator=1,Parent.ExchangeRate,1/Parent.ExchangeRate)</zNumberValue>
+							<zFormula>IIF(Parent.CurrencyCode=CONFIG('M_Ma_Tte0'),{0},{0}*{1})</zFormula>
+						</Eval_Ct0_UnitCost>
+						<Eval_Ct0_AtchDocVATInfo_ResetValue>
+							<DataMember>AtchDocOrder,ItemName,Unit,Quantity,OriginalUnitCost</DataMember>
+							<Value>NULL</Value>
+							<Expr>EMPTY(TaxCode)</Expr>
+						</Eval_Ct0_AtchDocVATInfo_ResetValue>
+						<!--27/06/2024 bổ sung các trường liên kết QTTU -->
+						<Eval_Ct0__BizDocPA_AR>
+							<DataMember>_BizDocPA_AR</DataMember>
+							<Value>ISNULL(BizDocId_PA, '') + '-' + ISNULL(BizDocId_AR, '')</Value>
+						</Eval_Ct0__BizDocPA_AR>
+						<Eval_Ct0__BizDocPA_AtchP>
+							<DataMember>_BizDocPA_AtchP</DataMember>
+							<Value>ISNULL(BizDocId_PA, '') + '-' + ISNULL(RowId_AtchPurchase, '')</Value>
+						</Eval_Ct0__BizDocPA_AtchP>
+						<Eval_Ct0__BizDocPA_PO>
+							<DataMember>_BizDocPA_PO</DataMember>
+							<Value>ISNULL(BizDocId_PA, '') + '-' + ISNULL(BizDocId_PO, '')</Value>
+						</Eval_Ct0__BizDocPA_PO>
+						<Eval_Ct0__BizDocPA_LC>
+							<DataMember>_BizDocPA_LC</DataMember>
+							<Value>ISNULL(BizDocId_PA, '') + '-' + ISNULL(BizDocId_LC, '')</Value>
+						</Eval_Ct0__BizDocPA_LC>
+					</Evaluators>
+					<BeforeTransaction>
+						<Eval_AtchDocE3_AddChildRow>
+							<ClassName>BravoAddRowEvaluator</ClassName>
+							<DataMember>AtchDocE3</DataMember>
+							<Expr>(!Empty(TaxCode) OR !Empty(DueDate)) AND Empty(AttachedRowId) AND !Exists(Child(AtchDocE3))</Expr>
+							<DefaultValues>
+								<DocCode>DocCode</DocCode>
+								<Stt>Stt</Stt>
+								<RowId_SourceDoc>RowId</RowId_SourceDoc>
+								<DocDate>Parent.DocDate</DocDate>
+								<AtchDocDate>IIF(Empty(TaxCode) AND !Empty(DueDate),Parent.DocDate,ISNULL(AttachedDocDate, Parent.DocDate))</AtchDocDate>
+								<AtchDocNo>IIF(Empty(TaxCode) AND !Empty(DueDate),Parent.DocNo,ISNULL(AttachedDocNo, Parent.DocNo))</AtchDocNo>
+								<AtchDocSerialNo>ISNULL(AttachedDocSerialNo,'')</AtchDocSerialNo>
+								<AtchDocFormNo>ISNULL(AttachedDocFormNo,'')</AtchDocFormNo>
+								<Description>ISNULL(Description,Parent.Description)</Description>
+								<Quantity>Quantity</Quantity>
+								<Account>IIF(Parent.DocGroup='1',CreditAccount,DebitAccount)</Account>
+								<CustomerId>CustomerId</CustomerId>
+								<EmployeeId>EmployeeId</EmployeeId>
+								<DueDate>DueDate</DueDate>
+								<OriginalDueAmount>ISNULL(OriginalAmount,0)+ISNULL(OriginalAmount3,0)</OriginalDueAmount>
+								<DueAmount>ISNULL(Amount,0)+ISNULL(Amount3,0)+IIF(DebitAccount=DebitAccount7,ISNULL(Amount7,0),0)</DueAmount>
+								<DebitAccount>DebitAccount3</DebitAccount>
+								<CreditAccount>CreditAccount3</CreditAccount>
+								<Amount>Amount3</Amount>
+								<OriginalAmount>OriginalAmount3</OriginalAmount>
+								<TaxCode>TaxCode</TaxCode>
+								<TaxRate>TaxRate</TaxRate>
+								<TaxRegNo>TaxRegNo</TaxRegNo>
+								<TaxRegName>TaxRegName</TaxRegName>
+								<OriginalAmountBeforeTax>IIF(Empty(TaxCode), 0, OriginalAmount)</OriginalAmountBeforeTax>
+								<AmountBeforeTax>IIF(Empty(TaxCode), 0, Amount)</AmountBeforeTax>
+								<!--15/11/2018 ChamVT thêm trường lưu hóa đơn điện tử -->
+								<EInvoiceLink>ISNULL(EInvoiceLink,'')</EInvoiceLink>
+								<EInvoiceKey>ISNULL(EInvoiceKey,'')</EInvoiceKey>
+								<!-- 02/06/2023 Bổ sung Quantity, Unit (TT80) -->
+								<Unit>Unit</Unit>
+								<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+								<AtchDocOrder>AtchDocOrder</AtchDocOrder>
+								<BuiltinOrder>BuiltinOrder</BuiltinOrder>
+								<ItemName>ItemName</ItemName>
+								<UnitCost>UnitCost</UnitCost>
+								<OriginalUnitCost>OriginalUnitCost</OriginalUnitCost>
+							</DefaultValues>
+						</Eval_AtchDocE3_AddChildRow>
+					</BeforeTransaction>
+					<DefaultValues>
+						<BranchCode>BRANCH()</BranchCode>
+						<BookingExchangeRate>1</BookingExchangeRate>
+					</DefaultValues>
+					<Validators>
+						<CheckNotNull>
+							<SourceColumn>DebitAccount,CreditAccount</SourceColumn>
+						</CheckNotNull>
+						<TransCodeNotNull>
+							<SourceColumn>TransCode</SourceColumn>
+							<Expr>Parent.UsingTransCode=2</Expr>
+						</TransCodeNotNull>
+						<CheckProductId>
+							<SourceColumn>ProductId,ProductDebitAccount,ProductCreditAccount</SourceColumn>
+							<TargetColumn>ProductId</TargetColumn>
+							<zValidateExpr>!((!Empty(ProductDebitAccount) OR !Empty(ProductCreditAccount)) AND Empty(ProductId))</zValidateExpr>
+							<Expr>ISNULL(Parent.UsingProductId,0)&lt;&gt;1</Expr>
+						</CheckProductId>
+						<CheckExpenseCatgId>
+							<SourceColumn>ExpenseCatgId,CheckExpenseCatgId</SourceColumn>
+							<TargetColumn>ExpenseCatgId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckExpenseCatgId) AND Empty(ExpenseCatgId))</zValidateExpr>
+							<Expr>Parent.UsingExpenseCatgId=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckExpenseCatgId>
+						<CheckDeptId>
+							<SourceColumn>DeptId,CheckDeptId</SourceColumn>
+							<TargetColumn>DeptId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckDeptId) AND Empty(DeptId))</zValidateExpr>
+							<Expr>Parent.UsingDeptId=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckDeptId>
+						<CheckBizDocId_PO>
+							<SourceColumn>BizDocId_PO,CheckBizDocId_PO</SourceColumn>
+							<TargetColumn>BizDocId_PO</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckBizDocId_PO) AND Empty(BizDocId_PO))</zValidateExpr>
+							<Expr>Parent.UsingBizDocId_PO=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckBizDocId_PO>
+						<CheckBizDocId_SO>
+							<SourceColumn>BizDocId_SO,CheckBizDocId_SO</SourceColumn>
+							<TargetColumn>BizDocId_SO</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckBizDocId_SO) AND Empty(BizDocId_SO))</zValidateExpr>
+							<Expr>Parent.UsingBizDocId_SO=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckBizDocId_SO>
+						<CheckJobId>
+							<SourceColumn>JobId,CheckJobId</SourceColumn>
+							<TargetColumn>JobId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckJobId) AND Empty(JobId))</zValidateExpr>
+							<Expr>Parent.UsingJobId=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckJobId>
+						<!--CheckTaxRegNo>
+                    <ClassName>BravoServerConstraintValidator</ClassName>
+                    <Command>ufn_sys_TaxRegNo_Validate</Command>
+                    <SourceColumn>TaxRegNo</SourceColumn>
+                    <bValidateWarning>True</bValidateWarning>
+                    <bValidateIfModify>True</bValidateIfModify>
+                    <bValidateIfNotEmpty>True</bValidateIfNotEmpty>
+                </CheckTaxRegNo-->
+						<CheckCostCentre>
+							<SourceColumn>CostCentreId,CheckCostCentre</SourceColumn>
+							<TargetColumn>CostCentreId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckCostCentre) AND Empty(CostCentreId))</zValidateExpr>
+							<Expr>ISNULL(Parent.UsingCostCentreId,0) =2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckCostCentre>
+						<!-- 28/06/2021 ANHPK bắt thêm điều kiện BeneficiaryBankAccId-->
+						<CheckDouble_DebitBankAccount>
+							<SourceColumn>DebitAccount,CashInDebitBankAccount</SourceColumn>
+							<TargetColumn>DebitAccount</TargetColumn>
+							<zValidateExpr>ISNULL(DebitAccount,'')=ISNULL(CashInDebitBankAccount,'') OR ISNULL(BankDebitAccount,0) = 0</zValidateExpr>
+							<Text>
+								<Vietnamese>Không chuyển tiền cùng lúc cho 2 TK ngân hàng trong 1 báo nợ</Vietnamese>
+								<English>Do not transfer money at the same time for 2 bank accounts in a debit note</English>
+								<Japanese>デビットノートで2つの銀行口座のために同時にお金を送金しないでください</Japanese>
+								<Chinese>不要在借方中的2个银行账户同时转账</Chinese>
+								<Korean>직불 카드에서 2 개의 은행 계좌를 동시에 양도하지 마십시오.</Korean>
+							</Text>
+						</CheckDouble_DebitBankAccount>
+						<CheckDueDateSide>
+							<!-- Cảnh báo nhập HTT sai vế -->
+							<ClassName>BravoValidator</ClassName>
+							<SourceColumn>DueDate,DebitAccount,DueSideDebitAccount</SourceColumn>
+							<TargetColumn>DueDate</TargetColumn>
+							<zValidateExpr>!(!Empty(DueDate) AND DueSideDebitAccount='Credit')</zValidateExpr>
+							<bValidateWarning>True</bValidateWarning>
+						</CheckDueDateSide>
+						<CheckDueDateEmpty>
+							<!-- Cảnh báo không nhập HTT với những Tk cùng vế theo dõi HTT -->
+							<ClassName>BravoNullValidator</ClassName>
+							<SourceColumn>DueDate,DebitAccount,DueSideDebitAccount,OriginalAmount</SourceColumn>
+							<TargetColumn>DueDate</TargetColumn>
+							<zValidateExpr>!(Empty(DueDate) AND !Empty(OriginalAmount) AND DueSideDebitAccount='Debit')</zValidateExpr>
+							<bValidateWarning>True</bValidateWarning>
+						</CheckDueDateEmpty>
+						<CheckCashFlowId>
+							<SourceColumn>CashFlowId,CheckCashFlowId</SourceColumn>
+							<TargetColumn>CashFlowId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckCashFlowId) AND Empty(CashFlowId))</zValidateExpr>
+							<Expr>Parent.UsingCashFlowId=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckCashFlowId>
+						<!-- 17/08/2022 LienNTP: Kiểm tra nhập trùng giữa các hóa đơn đầu vào -->
+						<CheckAtchDocUniqueVat>
+							<ClassName>BravoServerConstraintValidator</ClassName>
+							<Command>ufn_B30AccDoc_CheckUniqueVat</Command>
+							<SourceColumn>AttachedDocDate,AttachedDocNo,TaxRegNo,AttachedDocFormNo,AttachedDocSerialNo,TaxType</SourceColumn>
+							<TargetColumn>AttachedDocNo</TargetColumn>
+							<Parameters>
+								<AtchDocDate>AttachedDocDate</AtchDocDate>
+								<AtchDocNo>AttachedDocNo</AtchDocNo>
+								<TaxRegNo>TaxRegNo</TaxRegNo>
+								<AtchDocFormNo>AttachedDocFormNo</AtchDocFormNo>
+								<AtchDocSerialNo>AttachedDocSerialNo</AtchDocSerialNo>
+								<Stt>Stt</Stt>
+								<BranchCode>BRANCH()</BranchCode>
+								<TaxType>TaxType</TaxType>
+							</Parameters>
+							<bValidateIfModify>True</bValidateIfModify>
+							<bValidateIfNotEmpty>True</bValidateIfNotEmpty>
+							<bValidateWarning>True</bValidateWarning>
+							<Text>
+								<Vietnamese>Hóa đơn đầu vào đã tồn tại !</Vietnamese>
+								<English>Purchase invoice already exists !</English>
+								<Japanese>請求書の購入はすでに存在しています！</Japanese>
+								<Chinese>购买发票已经存在！</Chinese>
+								<Korean>구매 송장이 이미 존재합니다!</Korean>
+							</Text>
+						</CheckAtchDocUniqueVat>
+						<CheckWorkProcess>
+							<SourceColumn>WorkProcessId,CheckWorkProcess</SourceColumn>
+							<TargetColumn>WorkProcessId</TargetColumn>
+							<zValidateExpr>!(!EMPTY(CheckWorkProcess) AND EMPTY(WorkProcessId))</zValidateExpr>
+							<Expr>ISNULL(Parent.UsingWorkProcessId,0) IN (0,2)</Expr>
+						</CheckWorkProcess>
+						<CheckDebitAccount3>
+							<SourceColumn>OriginalAmount3,DebitAccount3</SourceColumn>
+							<TargetColumn>DebitAccount3</TargetColumn>
+							<zValidateExpr>!(!Empty(OriginalAmount3) AND Empty(DebitAccount3))</zValidateExpr>
+						</CheckDebitAccount3>
+						<CheckCreditAccount3>
+							<SourceColumn>OriginalAmount3,CreditAccount3</SourceColumn>
+							<TargetColumn>CreditAccount3</TargetColumn>
+							<zValidateExpr>!(!Empty(OriginalAmount3) AND Empty(CreditAccount3))</zValidateExpr>
+						</CheckCreditAccount3>
+					</Validators>
+					<ChildCollection>
+						<ChildTable_AtchDocE3>
+							<ChildKey>RowId_SourceDoc</ChildKey>
+							<Name>vB30AccDocAtchE3_Edit</Name>
+							<Alias>AtchDocE3</Alias>
+							<ParentKey>RowId</ParentKey>
+							<ParentTable>Ct0</ParentTable>
+							<RefreshColumnList>RowId</RefreshColumnList>
+							<CopyMode>Exclude</CopyMode>
+							<CopyList>Stt</CopyList>
+							<BeforeTransaction>
+								<Eval_AtchDocE3_DeleteIfEmptyTaxCode>
+									<ClassName>BravoDeleteRowEvaluator</ClassName>
+									<Expr>Empty(Parent.TaxCode) AND Empty(Parent.DueDate)</Expr>
+								</Eval_AtchDocE3_DeleteIfEmptyTaxCode>
+								<Eval_AtchDocE3_DefaultValueFromParent>
+									<ClassName>BravoCopyValue</ClassName>
+									<Expr>!Empty(Parent.TaxCode) OR !Empty(Parent.DueDate)</Expr>
+									<CopyValues>
+										<Stt>Parent.Stt</Stt>
+										<DocCode>Parent.DocCode</DocCode>
+										<DocDate>Parent.DocDate</DocDate>
+										<AtchDocDate>IIF(!Empty(Parent.AttachedDocDate) AND !Empty(Parent.TaxCode), Parent.AttachedDocDate, VLOOKUP(Ct, DocDate))</AtchDocDate>
+										<AtchDocNo>IIF(!Empty(Parent.AttachedDocNo) AND !Empty(Parent.TaxCode), Parent.AttachedDocNo, VLOOKUP(Ct, DocNo))</AtchDocNo>
+										<AtchDocSerialNo>Parent.AttachedDocSerialNo</AtchDocSerialNo>
+										<AtchDocFormNo>Parent.AttachedDocFormNo</AtchDocFormNo>
+										<Description>ISNULL(Parent.Description, VLOOKUP(Ct, Description))</Description>
+										<TaxRegNo>Parent.TaxRegNo</TaxRegNo>
+										<TaxRegName>Parent.TaxRegName</TaxRegName>
+										<Quantity>Parent.Quantity</Quantity>
+										<Account>IIF(Parent.DocGroup='1',Parent.CreditAccount,Parent.DebitAccount)</Account>
+										<CustomerId>Parent.CustomerId</CustomerId>
+										<EmployeeId>Parent.EmployeeId</EmployeeId>
+										<DueDate>Parent.DueDate</DueDate>
+										<OriginalDueAmount>ISNULL(Parent.OriginalAmount,0)+ISNULL(Parent.OriginalAmount3,0)</OriginalDueAmount>
+										<DueAmount>ISNULL(Parent.Amount,0)+ISNULL(Parent.Amount3,0)+IIF(Parent.DebitAccount=Parent.DebitAccount7,ISNULL(Parent.Amount7,0),0)</DueAmount>
+										<TaxCode>Parent.TaxCode</TaxCode>
+										<TaxRate>Parent.TaxRate</TaxRate>
+										<OriginalAmount>Parent.OriginalAmount3</OriginalAmount>
+										<Amount>Parent.Amount3</Amount>
+										<OriginalAmountBeforeTax>IIF(Empty(Parent.TaxCode), 0, Parent.OriginalAmount)</OriginalAmountBeforeTax>
+										<AmountBeforeTax>IIF(Empty(Parent.TaxCode), 0, Parent.Amount)</AmountBeforeTax>
+										<DebitAccount>Parent.DebitAccount3</DebitAccount>
+										<CreditAccount>Parent.CreditAccount3</CreditAccount>
+										<EInvoiceLink>Parent.EInvoiceLink</EInvoiceLink>
+										<EInvoiceKey>Parent.EInvoiceKey</EInvoiceKey>
+										<CurrencyCode>VLOOKUP(Ct,CurrencyCode)</CurrencyCode>
+										<ExchangeRate>VLOOKUP(Ct,ExchangeRate)</ExchangeRate>
+										<Posted>IIF(VLOOKUP(Ct,Posted)=1 AND VLOOKUP(Ct,PostGL)=True, 1, 0)</Posted>
+										<!-- 02/06/2023 Bổ sung Quantity, Unit (TT80) -->
+										<Unit>Parent.Unit</Unit>
+										<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+										<AtchDocOrder>Parent.AtchDocOrder</AtchDocOrder>
+										<BuiltinOrder>Parent.BuiltinOrder</BuiltinOrder>
+										<ItemName>Parent.ItemName</ItemName>
+										<UnitCost>Parent.UnitCost</UnitCost>
+										<OriginalUnitCost>Parent.OriginalUnitCost</OriginalUnitCost>
+									</CopyValues>
+								</Eval_AtchDocE3_DefaultValueFromParent>
+								<Eval_AtchDocE3_RowId_AutoValue>
+									<!-- Tạo sẵn RowId trước khi lưu -->
+									<ClassName>BravoServerConstraint</ClassName>
+									<Command>usp_sys_CreateSttBySeq</Command>
+									<dataAccessMode>Write</dataAccessMode>
+									<Parameters>
+										<TableName>LayoutTableName()</TableName>
+										<Ws_Id>Branch('Ws_Id')</Ws_Id>
+										<Ext>'ATD'</Ext>
+									</Parameters>
+									<DataMember>RowId</DataMember>
+									<Expr>Empty(RowId)</Expr>
+									<Text />
+								</Eval_AtchDocE3_RowId_AutoValue>
+							</BeforeTransaction>
+							<DefaultValues>
+								<BranchCode>BRANCH()</BranchCode>
+								<AtchDocType>'E3'</AtchDocType>
+							</DefaultValues>
+						</ChildTable_AtchDocE3>
+					</ChildCollection>
+				</ChildTable_Detail>
+				<ChildTable_AtchDoc>
+					<ChildKey>Stt</ChildKey>
+					<Name>vB30AccDocAtchOther_Edit</Name>
+					<Alias>AtchDoc</Alias>
+					<ParentKey>Stt</ParentKey>
+					<Sort>BuiltinOrder</Sort>
+					<Expressions>
+						<TaxType_Ct>Parent.TaxType_Ct</TaxType_Ct>
+						<ExchangeRate>Parent.ExchangeRate</ExchangeRate>
+						<CurrencyCode>Parent.CurrencyCode</CurrencyCode>
+						<DocGroup>Parent.DocGroup</DocGroup>
+						<ExchangeRateOperator>Parent.ExchangeRateOperator</ExchangeRateOperator>
+					</Expressions>
+					<TempColumns>
+						<TaxType>
+							<DataType>System.Byte</DataType>
+						</TaxType>
+						<PriceIncludeTax>
+							<DataType>System.Byte</DataType>
+						</PriceIncludeTax>
+						<Account_VAT>
+							<DataType>System.String</DataType>
+						</Account_VAT>
+						<ExchangeRate>
+							<DataType>System.Decimal</DataType>
+						</ExchangeRate>
+						<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+						<ProductDebitAccount_VAT>
+							<DataType>System.Byte</DataType>
+						</ProductDebitAccount_VAT>
+						<ProductCreditAccount_VAT>
+							<DataType>System.Byte</DataType>
+						</ProductCreditAccount_VAT>
+						<CheckExpenseCatgId>
+							<DataType>System.Byte</DataType>
+						</CheckExpenseCatgId>
+						<CheckDeptId>
+							<DataType>System.Byte</DataType>
+						</CheckDeptId>
+						<CheckBizDocId_PO>
+							<DataType>System.Byte</DataType>
+						</CheckBizDocId_PO>
+						<CheckBizDocId_SO>
+							<DataType>System.Byte</DataType>
+						</CheckBizDocId_SO>
+						<CheckJobId>
+							<DataType>System.Byte</DataType>
+						</CheckJobId>
+						<CheckCostCentre>
+							<DataType>System.Byte</DataType>
+						</CheckCostCentre>
+						<CheckWorkProcess>
+							<DataType>System.Byte</DataType>
+						</CheckWorkProcess>
+						<CheckCashFlowId>
+							<DataType>System.Byte</DataType>
+						</CheckCashFlowId>
+						<ButtEInvoiceLink>
+							<DataType>System.String</DataType>
+							<DefaultValue>''</DefaultValue>
+						</ButtEInvoiceLink>
+						<TaxRegNoStatus>
+							<!-- 27/12/2024 dùng API lấy thông tin từ MST -->
+							<DataType>System.String</DataType>
+						</TaxRegNoStatus>
+					</TempColumns>
+					<RowAdded>
+						<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+						<Eval_Atch_CheckBizDocId_PO_GetValueFromParent>Parent.UsingTransCode=1</Eval_Atch_CheckBizDocId_PO_GetValueFromParent>
+						<Eval_Atch_CheckBizDocId_SO_GetValueFromParent>Parent.UsingTransCode=1</Eval_Atch_CheckBizDocId_SO_GetValueFromParent>
+						<Eval_Atch_CheckJobId_GetValueFromParent>Parent.UsingTransCode=1</Eval_Atch_CheckJobId_GetValueFromParent>
+						<Eval_Atch_CheckExpenseCatgId_GetValueFromParent>Parent.UsingTransCode=1</Eval_Atch_CheckExpenseCatgId_GetValueFromParent>
+						<Eval_Atch_CheckCashFlowId_GetValueFromParent>Parent.UsingTransCode=1</Eval_Atch_CheckCashFlowId_GetValueFromParent>
+						<Eval_Atch_CheckCostCentreId_GetValueFromParent>Parent.UsingTransCode=1</Eval_Atch_CheckCostCentreId_GetValueFromParent>
+						<Eval_Atch_CheckDeptId_GetValueFromParent>Parent.UsingTransCode=1</Eval_Atch_CheckDeptId_GetValueFromParent>
+						<Eval_CheckProductAccount_GetValueFromChild />
+					</RowAdded>
+					<TableMerged>
+						<Eval_TotalOriginalAmount3 />
+						<Eval_TotalAmount3 />
+						<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+						<Eval_CheckProductAccount_GetValueFromChild />
+					</TableMerged>
+					<ServerLoaded>
+						<Eval_AtchDoc_TaxCode_BindingMember>
+							<ClassName>BravoBindingMember</ClassName>
+							<DataMember>TaxCode</DataMember>
+							<LookupKey>Tax</LookupKey>
+							<bindingMembers>
+								<Rate>TaxRate</Rate>
+								<PriceIncludeTax>PriceIncludeTax</PriceIncludeTax>
+								<Type>TaxType</Type>
+								<Account>Account_VAT</Account>
+							</bindingMembers>
+							<Expr>!Empty(TaxCode)</Expr>
+						</Eval_AtchDoc_TaxCode_BindingMember>
+						<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+						<Eval_CheckProductAccount_GetValueFromChild>Parent.UsingProductId=1</Eval_CheckProductAccount_GetValueFromChild>
+					</ServerLoaded>
+					<BeforeTransaction>
+						<Eval_AtchDoc_DefaultValueFromParent>
+							<ClassName>BravoCopyValue</ClassName>
+							<CopyValues>
+								<DocCode>Parent.DocCode</DocCode>
+								<DocDate>Parent.DocDate</DocDate>
+								<CustomerId>Parent.CustomerId</CustomerId>
+								<Description>IIF(Empty(Description),Parent.Description,Description)</Description>
+								<CurrencyCode>Parent.CurrencyCode</CurrencyCode>
+								<ExchangeRate>Parent.ExchangeRate</ExchangeRate>
+								<Posted>IIF(Parent.Posted=1 AND Parent.PostGL=1, 1, 0)</Posted>
+								<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+								<EmployeeId>IIF(Parent.UsingEmployeeId=1,Parent.EmployeeId,EmployeeId)</EmployeeId>
+								<BizDocId_LC>IIF(Parent.UsingBizDocId_LC=1,Parent.BizDocId_LC,BizDocId_LC)</BizDocId_LC>
+								<BizDocId_DA>IIF(Parent.UsingBizDocId_DA=1,Parent.BizDocId_DA,BizDocId_DA)</BizDocId_DA>
+								<BizDocId_G2>IIF(Parent.UsingBizDocId_G2=1,Parent.BizDocId_G2,BizDocId_G2)</BizDocId_G2>
+								<BizDocId_G3>IIF(Parent.UsingBizDocId_G3=1,Parent.BizDocId_G3,BizDocId_G3)</BizDocId_G3>
+								<BizDocId_PO>IIF(Parent.UsingBizDocId_PO=1,Parent.BizDocId_PO,BizDocId_PO)</BizDocId_PO>
+								<BizDocId_SO>IIF(Parent.UsingBizDocId_SO=1,Parent.BizDocId_SO,BizDocId_SO)</BizDocId_SO>
+								<DeptId>IIF(Parent.UsingDeptId=1,Parent.DeptId,DeptId)</DeptId>
+								<JobId>IIF(Parent.UsingJobId=1,Parent.JobId,JobId)</JobId>
+								<ExpenseCatgId>IIF(Parent.UsingExpenseCatgId=1,Parent.ExpenseCatgId,ExpenseCatgId)</ExpenseCatgId>
+								<ProductId>IIF(Parent.UsingProductId=1,Parent.ProductId,ProductId)</ProductId>
+								<WorkProcessId>IIF(Parent.UsingWorkProcessId=1,Parent.WorkProcessId,WorkProcessId)</WorkProcessId>
+								<CostCentreId>IIF(Parent.UsingCostCentreId=1,Parent.CostCentreId,CostCentreId)</CostCentreId>
+								<CashFlowId>IIF(Parent.UsingCashFlowId=1,Parent.CashFlowId,CashFlowId)</CashFlowId>
+								<CustomFieldId1>IIF(Parent.UsingCustomFieldId1=1,Parent.CustomFieldId1,CustomFieldId1)</CustomFieldId1>
+								<CustomFieldId2>IIF(Parent.UsingCustomFieldId2=1,Parent.CustomFieldId2,CustomFieldId2)</CustomFieldId2>
+								<CustomFieldId3>IIF(Parent.UsingCustomFieldId3=1,Parent.CustomFieldId3,CustomFieldId3)</CustomFieldId3>
+								<!--29/05/2024 thêm khoản mục dòng tiền tài chính để lên DL báo cáo LCTT, TMBCTC-->
+								<NoteFactorId>IIF(Parent.UsingNoteFactorId=1,Parent.NoteFactorId,NoteFactorId)</NoteFactorId>
+							</CopyValues>
+						</Eval_AtchDoc_DefaultValueFromParent>
+						<Eval_AtchDoc_RowId_AutoValue>
+							<!-- Tạo sẵn RowId trước khi lưu -->
+							<ClassName>BravoServerConstraint</ClassName>
+							<Command>usp_sys_CreateSttBySeq</Command>
+							<dataAccessMode>Write</dataAccessMode>
+							<Parameters>
+								<TableName>LayoutTableName()</TableName>
+								<Ws_Id>Branch('Ws_Id')</Ws_Id>
+								<Ext>'ATD'</Ext>
+							</Parameters>
+							<DataMember>RowId</DataMember>
+							<Expr>Empty(RowId)</Expr>
+							<Text />
+						</Eval_AtchDoc_RowId_AutoValue>
+					</BeforeTransaction>
+					<ColumnChanged>
+						<OriginalAmountBeforeTax>
+							<Eval_AtchDoc_AmountBeforeTax />
+							<Eval_AtchDoc_OriginalAmount />
+							<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+							<Eval_AtchDoc_OriginalUnitCost />
+						</OriginalAmountBeforeTax>
+						<TaxCode>
+							<Eval_AttachedTaxInfo />
+							<Eval_AtchDoc_TaxRegNo_ResetValue>
+								<DataMember>TaxRegNo,TaxRegName</DataMember>
+								<Value>NULL</Value>
+								<Expr>Empty(TaxCode)</Expr>
+							</Eval_AtchDoc_TaxRegNo_ResetValue>
+							<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+							<Eval_AtchDoc_AtchDocVATInfo_ResetValue />
+						</TaxCode>
+						<TaxType>
+							<Eval_AtchDoc_OriginalAmount />
+							<Eval_AtchDoc_DebitAccount_DefaultValue />
+							<Eval_AtchDoc_CreditAccount_DefaultValue />
+						</TaxType>
+						<TaxRate>
+							<Eval_AtchDoc_OriginalAmount />
+						</TaxRate>
+						<Account_VAT>
+							<Eval_AtchDoc_DebitAccount_DefaultValue />
+							<Eval_AtchDoc_CreditAccount_DefaultValue />
+						</Account_VAT>
+						<OriginalAmount>
+							<Eval_AtchDoc_OriginalAmount>UpdatedColumn()='OriginalAmount'</Eval_AtchDoc_OriginalAmount>
+							<Eval_AtchDoc_Amount />
+							<Eval_TotalOriginalAmount3 />
+						</OriginalAmount>
+						<Amount>
+							<Eval_AtchDoc_Amount>UpdatedColumn()='Amount'</Eval_AtchDoc_Amount>
+							<Eval_TotalAmount3 />
+						</Amount>
+						<AmountBeforeTax>
+							<Eval_AtchDoc_AmountBeforeTax>UpdatedColumn()='AmountBeforeTax'</Eval_AtchDoc_AmountBeforeTax>
+						</AmountBeforeTax>
+						<DebitAccount>
+							<Eval_AtchDoc_DebitAccount_DefaultValue />
+						</DebitAccount>
+						<CreditAccount>
+							<Eval_AtchDoc_CreditAccount_DefaultValue />
+						</CreditAccount>
+						<ProductDebitAccount_VAT>
+							<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+							<Eval_CheckProductAccount_GetValueFromChild>Parent.UsingProductId=1</Eval_CheckProductAccount_GetValueFromChild>
+						</ProductDebitAccount_VAT>
+						<ProductCreditAccount_VAT>
+							<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+							<Eval_CheckProductAccount_GetValueFromChild>Parent.UsingProductId=1</Eval_CheckProductAccount_GetValueFromChild>
+						</ProductCreditAccount_VAT>
+						<EInvoiceLink>
+							<Eval_AtchDoc_ButtEInvoiceLink_DefaultValue>
+								<DataMember>ButtEInvoiceLink</DataMember>
+								<Value>EInvoiceLink</Value>
+							</Eval_AtchDoc_ButtEInvoiceLink_DefaultValue>
+						</EInvoiceLink>
+						<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+						<Quantity>
+							<Eval_AtchDoc_OriginalUnitCost />
+						</Quantity>
+						<OriginalUnitCost>
+							<Eval_AtchDoc_OriginalUnitCost_SetValue>UPDATEDCOLUMN()='OriginalUnitCost'</Eval_AtchDoc_OriginalUnitCost_SetValue>
+							<Eval_AtchDoc_UnitCost />
+						</OriginalUnitCost>
+						<AtchDocOrder>
+							<Eval_AtchDoc_AtchDocOrder_SetValue>
+								<DataMember>AtchDocOrder</DataMember>
+								<Value>ABS(AtchDocOrder)</Value>
+								<bSuppressChangeEvents>True</bSuppressChangeEvents>
+								<Expr>!EMPTY(AtchDocOrder)</Expr>
+							</Eval_AtchDoc_AtchDocOrder_SetValue>
+						</AtchDocOrder>
+						<TaxRegNo>
+							<Eval_AtchDoc_TaxRegNo_ActiveStatus>
+								<!-- 27/12/2024 dùng API lấy thông tin từ MST -->
+								<ClassName>BravoDataServiceEvaluator</ClassName>
+								<DataMember>TaxRegNo</DataMember>
+								<bindingMembers>
+									<Status>TaxRegNoStatus</Status>
+									<CompanyName>TaxRegName</CompanyName>
+								</bindingMembers>
+							</Eval_AtchDoc_TaxRegNo_ActiveStatus>
+						</TaxRegNo>
+					</ColumnChanged>
+					<Evaluators>
+						<Eval_AtchDoc_ExchangeRate_DefaultFromParent>
+							<DataMember>ExchangeRate</DataMember>
+							<Expr>!Empty(Parent.ExchangeRate)</Expr>
+							<Value>Parent.ExchangeRate</Value>
+						</Eval_AtchDoc_ExchangeRate_DefaultFromParent>
+						<Eval_AtchDoc_AmountBeforeTax>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>AmountBeforeTax</DataMember>
+							<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+							<zMoneyValue>OriginalAmountBeforeTax</zMoneyValue>
+							<zNumberValue>IIF(Parent.ExchangeRateOperator=1,ExchangeRate,IIF(ExchangeRate=0,0,1/ExchangeRate))</zNumberValue>
+							<zResultMarginValue>IIF(UpdatedColumn()='AmountBeforeTax',Parent.MoneyDiffValue0,0)</zResultMarginValue>
+						</Eval_AtchDoc_AmountBeforeTax>
+						<Eval_AtchDoc_OriginalAmount>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>OriginalAmount</DataMember>
+							<Expr>TaxType IS NULL OR !Empty(TaxRate)</Expr>
+							<zMoneyValue>OriginalAmountBeforeTax</zMoneyValue>
+							<zNumberValue>IIF(ISNULL(PriceIncludeTax,0)=1,TaxRate/(1+TaxRate),TaxRate)</zNumberValue>
+							<zResultDecimalRound>Parent.DecimalRound</zResultDecimalRound>
+							<zResultMarginValue>IIF(UpdatedColumn()='OriginalAmount',Parent.VATDiffValue,0)</zResultMarginValue>
+						</Eval_AtchDoc_OriginalAmount>
+						<Eval_AtchDoc_Amount>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>Amount</DataMember>
+							<zMoneyValue>OriginalAmount</zMoneyValue>
+							<zNumberValue>IIF(Parent.ExchangeRateOperator=1,ExchangeRate,IIF(ExchangeRate=0,0,1/ExchangeRate))</zNumberValue>
+							<zResultMarginValue>IIF(UpdatedColumn()='Amount',Parent.VATDiffValue0,0)</zResultMarginValue>
+							<zResultDecimalRound>Currency('DecimalRound')</zResultDecimalRound>
+						</Eval_AtchDoc_Amount>
+						<Eval_AtchDoc_DebitAccount_DefaultValue>
+							<DataMember>DebitAccount</DataMember>
+							<Expr>TaxType IS NULL OR Empty(DebitAccount)</Expr>
+							<Value>IIF(TaxType=1,Account_VAT,IIF(TaxType=2,Parent.DebitAccount,NULL))</Value>
+						</Eval_AtchDoc_DebitAccount_DefaultValue>
+						<Eval_AtchDoc_CreditAccount_DefaultValue>
+							<DataMember>CreditAccount</DataMember>
+							<Expr>TaxType IS NULL OR Empty(CreditAccount)</Expr>
+							<Value>IIF(TaxType=1,Parent.CreditAccount,IIF(TaxType=2,Account_VAT,NULL))</Value>
+						</Eval_AtchDoc_CreditAccount_DefaultValue>
+						<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+						<Eval_AtchDoc_DebitAccount_BindingMember>
+							<ClassName>BravoBindingMember</ClassName>
+							<DataMember>DebitAccount</DataMember>
+							<LookupKey>ChartOfAccount</LookupKey>
+							<bindingMembers>
+								<ProductAccount>ProductDebitAccount_VAT</ProductAccount>
+							</bindingMembers>
+							<Expr>!Empty(DebitAccount)</Expr>
+						</Eval_AtchDoc_DebitAccount_BindingMember>
+						<Eval_AtchDoc_CreditAccount_BindingMember>
+							<ClassName>BravoBindingMember</ClassName>
+							<DataMember>CreditAccount</DataMember>
+							<LookupKey>ChartOfAccount</LookupKey>
+							<bindingMembers>
+								<ProductAccount>ProductCreditAccount_VAT</ProductAccount>
+							</bindingMembers>
+							<Expr>!Empty(CreditAccount)</Expr>
+						</Eval_AtchDoc_CreditAccount_BindingMember>
+						<Eval_Atch_CheckBizDocId_PO_GetValueFromParent>
+							<DataMember>CheckBizDocId_PO</DataMember>
+							<Value>Parent.CheckBizDocId_PO</Value>
+						</Eval_Atch_CheckBizDocId_PO_GetValueFromParent>
+						<Eval_Atch_CheckBizDocId_SO_GetValueFromParent>
+							<DataMember>CheckBizDocId_SO</DataMember>
+							<Value>Parent.CheckBizDocId_SO</Value>
+						</Eval_Atch_CheckBizDocId_SO_GetValueFromParent>
+						<Eval_Atch_CheckExpenseCatgId_GetValueFromParent>
+							<DataMember>CheckExpenseCatgId</DataMember>
+							<Value>Parent.CheckExpenseCatgId</Value>
+						</Eval_Atch_CheckExpenseCatgId_GetValueFromParent>
+						<Eval_Atch_CheckDeptId_GetValueFromParent>
+							<DataMember>CheckDeptId</DataMember>
+							<Value>Parent.CheckDeptId</Value>
+						</Eval_Atch_CheckDeptId_GetValueFromParent>
+						<Eval_Atch_CheckJobId_GetValueFromParent>
+							<DataMember>CheckJobId</DataMember>
+							<Value>Parent.CheckJobId</Value>
+						</Eval_Atch_CheckJobId_GetValueFromParent>
+						<Eval_Atch_CheckCashFlowId_GetValueFromParent>
+							<DataMember>CheckCashFlowId</DataMember>
+							<Value>Parent.CheckCashFlowId</Value>
+						</Eval_Atch_CheckCashFlowId_GetValueFromParent>
+						<Eval_Atch_CheckCostCentreId_GetValueFromParent>
+							<DataMember>CheckCostCentre</DataMember>
+							<Value>Parent.CheckCostCentre</Value>
+						</Eval_Atch_CheckCostCentreId_GetValueFromParent>
+						<Eval_Atch_GetTransInfoFromParent>
+							<ClassName>BravoCopyValue</ClassName>
+							<Expr>Parent.UsingTransCode=1</Expr>
+							<CopyValues>
+								<CheckExpenseCatgId>Parent.CheckExpenseCatgId</CheckExpenseCatgId>
+								<CheckDeptId>Parent.CheckDeptId</CheckDeptId>
+								<CheckJobId>Parent.CheckJobId</CheckJobId>
+								<CheckBizDocId_PO>Parent.CheckBizDocId_PO</CheckBizDocId_PO>
+								<CheckBizDocId_SO>Parent.CheckBizDocId_SO</CheckBizDocId_SO>
+								<CheckCostCentre>Parent.CheckCostCentre</CheckCostCentre>
+								<CheckCashFlowId>Parent.CheckCashFlowId</CheckCashFlowId>
+							</CopyValues>
+						</Eval_Atch_GetTransInfoFromParent>
+						<!--16/10/2023 ANHPK thêm thông tin vật tư bổ sung hóa đơn VAT-->
+						<Eval_AtchDoc_OriginalUnitCost>
+							<DataMember>OriginalUnitCost</DataMember>
+							<Value>IIF(EMPTY(Quantity),0,OriginalAmountBeforeTax/Quantity)</Value>
+							<Expr>!Empty(OriginalAmountBeforeTax)</Expr>
+						</Eval_AtchDoc_OriginalUnitCost>
+						<Eval_AtchDoc_OriginalUnitCost_SetValue>
+							<DataMember>OriginalUnitCost</DataMember>
+							<Value>IIF(ABS(OriginalUnitCost*Quantity-OriginalAmountBeforeTax)&gt;Parent.MoneyDiffValue0,IIF(EMPTY(Quantity),0,OriginalAmountBeforeTax/Quantity),OriginalUnitCost)</Value>
+							<Expr>!EMPTY(Quantity) AND !Empty(OriginalAmountBeforeTax)</Expr>
+						</Eval_AtchDoc_OriginalUnitCost_SetValue>
+						<Eval_AtchDoc_UnitCost>
+							<ClassName>BravoMoneyEvaluator</ClassName>
+							<DataMember>UnitCost</DataMember>
+							<zResultDecimalRound>5</zResultDecimalRound>
+							<zMoneyValue>OriginalUnitCost</zMoneyValue>
+							<zNumberValue>IIF(Parent.ExchangeRateOperator=1,Parent.ExchangeRate,1/Parent.ExchangeRate)</zNumberValue>
+							<zFormula>IIF(Parent.CurrencyCode=CONFIG('M_Ma_Tte0'),{0},{0}*{1})</zFormula>
+						</Eval_AtchDoc_UnitCost>
+						<Eval_AtchDoc_UpdateBuiltinOrder>
+							<ClassName>BravoTableOrderer</ClassName>
+							<DataMember>BuiltinOrder</DataMember>
+						</Eval_AtchDoc_UpdateBuiltinOrder>
+						<Eval_AtchDoc_AtchDocVATInfo_ResetValue>
+							<DataMember>AtchDocOrder,ItemName,Unit,Quantity,OriginalUnitCost</DataMember>
+							<Value>NULL</Value>
+							<Expr>EMPTY(TaxCode)</Expr>
+						</Eval_AtchDoc_AtchDocVATInfo_ResetValue>
+					</Evaluators>
+					<DefaultValues>
+						<BranchCode>BRANCH()</BranchCode>
+						<AtchDocDate>GETDATE()</AtchDocDate>
+					</DefaultValues>
+					<Validators>
+						<NotNull>
+							<SourceColumn>AtchDocDate,AtchDocNo</SourceColumn>
+						</NotNull>
+						<CheckDebitAccount>
+							<SourceColumn>DebitAccount,TaxCode</SourceColumn>
+							<TargetColumn>DebitAccount</TargetColumn>
+							<zValidateExpr>!(!Empty(TaxCode) AND Empty(DebitAccount))</zValidateExpr>
+						</CheckDebitAccount>
+						<CheckCreditAccount>
+							<SourceColumn>CreditAccount,TaxCode</SourceColumn>
+							<TargetColumn>CreditAccount</TargetColumn>
+							<zValidateExpr>!(!Empty(TaxCode) AND Empty(CreditAccount))</zValidateExpr>
+						</CheckCreditAccount>
+						<!-- 17/08/2022 LienNTP: Kiểm tra nhập trùng giữa các hóa đơn đầu vào -->
+						<CheckAtchDocUniqueVat>
+							<ClassName>BravoServerConstraintValidator</ClassName>
+							<Command>ufn_B30AccDoc_CheckUniqueVat</Command>
+							<SourceColumn>AtchDocDate,AtchDocNo,TaxRegNo,AtchDocFormNo,AtchDocSerialNo,TaxType</SourceColumn>
+							<TargetColumn>AtchDocNo</TargetColumn>
+							<Parameters>
+								<AtchDocDate>AtchDocDate</AtchDocDate>
+								<AtchDocNo>AtchDocNo</AtchDocNo>
+								<TaxRegNo>TaxRegNo</TaxRegNo>
+								<AtchDocFormNo>AtchDocFormNo</AtchDocFormNo>
+								<AtchDocSerialNo>AtchDocSerialNo</AtchDocSerialNo>
+								<Stt>Stt</Stt>
+								<BranchCode>BRANCH()</BranchCode>
+								<TaxType>TaxType</TaxType>
+							</Parameters>
+							<bValidateIfModify>True</bValidateIfModify>
+							<bValidateIfNotEmpty>True</bValidateIfNotEmpty>
+							<bValidateWarning>True</bValidateWarning>
+							<Text>
+								<Vietnamese>Hóa đơn đầu vào đã tồn tại !</Vietnamese>
+								<English>Purchase invoice already exists !</English>
+								<Japanese>請求書の購入はすでに存在しています！</Japanese>
+								<Chinese>购买发票已经存在！</Chinese>
+								<Korean>구매 송장이 이미 존재합니다!</Korean>
+							</Text>
+						</CheckAtchDocUniqueVat>
+						<!-- 26/09/2022: ĐứcCM bổ sung các trường thông tin cho chứng từ đi kèm -->
+						<CheckProductId>
+							<SourceColumn>ProductId,ProductDebitAccount_VAT,ProductCreditAccount_VAT</SourceColumn>
+							<TargetColumn>ProductId</TargetColumn>
+							<zValidateExpr>!((!Empty(ProductDebitAccount_VAT) OR !Empty(ProductCreditAccount_VAT)) AND Empty(ProductId))</zValidateExpr>
+							<Expr>ISNULL(Parent.UsingProductId,0)&lt;&gt;1</Expr>
+						</CheckProductId>
+						<CheckExpenseCatgId>
+							<SourceColumn>ExpenseCatgId,CheckExpenseCatgId</SourceColumn>
+							<TargetColumn>ExpenseCatgId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckExpenseCatgId) AND Empty(ExpenseCatgId))</zValidateExpr>
+							<Expr>Parent.UsingExpenseCatgId=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckExpenseCatgId>
+						<CheckDeptId>
+							<SourceColumn>DeptId,CheckDeptId</SourceColumn>
+							<TargetColumn>DeptId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckDeptId) AND Empty(DeptId))</zValidateExpr>
+							<Expr>Parent.UsingDeptId=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckDeptId>
+						<CheckBizDocId_PO>
+							<SourceColumn>BizDocId_PO,CheckBizDocId_PO</SourceColumn>
+							<TargetColumn>BizDocId_PO</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckBizDocId_PO) AND Empty(BizDocId_PO))</zValidateExpr>
+							<Expr>Parent.UsingBizDocId_PO=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckBizDocId_PO>
+						<CheckBizDocId_SO>
+							<SourceColumn>BizDocId_SO,CheckBizDocId_SO</SourceColumn>
+							<TargetColumn>BizDocId_SO</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckBizDocId_SO) AND Empty(BizDocId_SO))</zValidateExpr>
+							<Expr>Parent.UsingBizDocId_SO=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckBizDocId_SO>
+						<CheckJobId>
+							<SourceColumn>JobId,CheckJobId</SourceColumn>
+							<TargetColumn>JobId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckJobId) AND Empty(JobId))</zValidateExpr>
+							<Expr>Parent.UsingJobId=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckJobId>
+						<CheckCostCentre>
+							<SourceColumn>CostCentreId,CheckCostCentre</SourceColumn>
+							<TargetColumn>CostCentreId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckCostCentre) AND Empty(CostCentreId))</zValidateExpr>
+							<Expr>ISNULL(Parent.UsingCostCentreId,0)=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckCostCentre>
+						<CheckCashFlowId>
+							<SourceColumn>CashFlowId,CheckCashFlowId</SourceColumn>
+							<TargetColumn>CashFlowId</TargetColumn>
+							<zValidateExpr>!(!Empty(CheckCashFlowId) AND Empty(CashFlowId))</zValidateExpr>
+							<Expr>Parent.UsingCashFlowId=2 AND !Empty(Parent.UsingTransCode)</Expr>
+						</CheckCashFlowId>
+					</Validators>
+				</ChildTable_AtchDoc>
+				<ChildTable_AtchFile>
+					<Name>vB20FileStore</Name>
+					<Alias>AtchFile</Alias>
+					<ParentKey>Stt</ParentKey>
+					<ChildKey>Stt</ChildKey>
+					<Sort>BuiltinOrder</Sort>
+					<CopyMode>Never</CopyMode>
+					<RowAdded>
+						<Eval_AtchFile_DocCode_SetValueFromParent>
+							<DataMember>DocCode</DataMember>
+							<Value>Parent.DocCode</Value>
+						</Eval_AtchFile_DocCode_SetValueFromParent>
+					</RowAdded>
+					<ColumnChanged>
+						<FileSize>
+							<Eval_AtchFile_FileSizeInKB>
+								<DataMember>FileSize</DataMember>
+								<Value>FileSize/1024</Value>
+								<bSuppressChangeEvents>True</bSuppressChangeEvents>
+							</Eval_AtchFile_FileSizeInKB>
+						</FileSize>
+					</ColumnChanged>
+					<Validators>
+						<NotNull>
+							<SourceColumn>FileName</SourceColumn>
+						</NotNull>
+					</Validators>
+				</ChildTable_AtchFile>
+			</ChildCollection>
+		</Ct>
+	</TableCollection>
+</root>
